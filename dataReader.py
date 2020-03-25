@@ -4,7 +4,7 @@
 import glob, os
 import pandas as pd
 import numpy as np
-
+import re
 import json
 from tqdm import tqdm
 
@@ -26,9 +26,17 @@ def getListOfFiles(path, extention=None):
 path_all_archives = './Data/CORD-19-research-challenge/'
 
 path_bioarxiv = 'biorxiv_medrxiv/biorxiv_medrxiv/'
+path_comm_use = 'comm_use_subset/comm_use_subset/'
+path_cust_lic = 'custom_license/custom_license/'
+path_non_comm_use = 'noncomm_use_subset/noncomm_use_subset/'
 
 ###########################################################################
 
+############################### JSON to csv ############################
+
+# code is from this Kaggle kernel
+
+###########################################################################
 
 import os
 import json
@@ -38,6 +46,8 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+
+
 
 
 def format_name(author):
@@ -150,21 +160,63 @@ def generate_clean_df(all_files):
     
     return clean_df
 
+############################### Pattern matching ##########################
+
+###########################################################################
+
+
+def getPattern(x,pattern):
+    "Method that returns regular expression patterns"
+
+    findings = re.findall(pattern,x)
+
+    if len(findings) > 0:
+        return findings[0]
+    else:
+        return np.nan
+
+
+def getCSVPapers(filenames,relative_path):
+
+    files = []
+
+    for i in range(len(filenames)):
+        file = json.load(open(path_all_archives+relative_path+ filenames[i]))
+        
+        files.append(file)
+
+    df = generate_clean_df(files)
+
+    tqdm.pandas()
+
+    pattern = r"\b(https://doi.org/10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+)\b"
+
+    links = df['text'].progress_apply(lambda x: getPattern(x,pattern) ) 
+    
+    df['links'] = links
+
+    return df
 
 
 
 if __name__ == "__main__":
 
-    filenames = getListOfFiles(path_all_archives+path_bioarxiv,extention='json')[:3]
+    filenames_bioarxiv = getListOfFiles(path_all_archives+path_bioarxiv,extention='json')
+    df_bioarxiv = getCSVPapers(filenames_bioarxiv,path_bioarxiv)
+    df_bioarxiv.to_csv('./Data/bioarxiv_papers.csv',index=False)
+    print('Finished analysis of bioarxiv!')
 
-    files = []
+    filenames_comm_use = getListOfFiles(path_all_archives+path_comm_use,extention='json')
+    df_comm_use = getCSVPapers(filenames_comm_use,path_comm_use)
+    df_comm_use.to_csv('./Data/comm_use_papers.csv',index=False)
+    print('Finished analysis of comm use!')
 
-    for i in range(len(filenames)):
-        file = json.load(open(path_all_archives+path_bioarxiv+ filenames[i]))
-        
-        files.append(file)
+    filenames_cust_lic = getListOfFiles(path_all_archives+path_cust_lic,extention='json')
+    df_cust_lic = getCSVPapers(filenames_cust_lic,path_cust_lic)
+    df_cust_lic.to_csv('./Data/cust_lic_papers.csv',index=False)
+    print('Finished analysis of custom lic!')
 
-    df = generate_clean_df(files)
-    
-    print(df.iloc[:,:2])
-    print(df.columns)
+    filenames_non_comm_use = getListOfFiles(path_all_archives+path_non_comm_use,extention='json')
+    df_non_comm_use = getCSVPapers(filenames_non_comm_use,path_non_comm_use)
+    df_non_comm_use.to_csv('./Data/non_comm_use_papers.csv',index=False)
+    print('Finished analysis of non comm use!')
