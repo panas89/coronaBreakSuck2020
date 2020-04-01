@@ -1,5 +1,17 @@
 # coronaBreakSuck2020
 
+# files
+
+- dataPreProcessing.py: reads csv files and preProcesses them using nltk, choose if to run files with text or only the metadata files, default only metadata
+- nltkPreProc.py: module that contains text pre-processing methods
+- dataReader.py: reads json format citations and converts them to csv format
+- .gitignore: python gitignore file, create a Data folder to store data (ignored by git, all relative paths designed for this folder)
+- requirements.txt: all dependecies needed to run the project
+
+```
+pip install -r requirements.txt
+```
+
 # Project Goal 
 We want to build a knowledge discovery system for everyone (in particular the healthcare professionals) that can solve some of the questions in the Kaggle COVID-19 Open Research Dataset Challenge (CORD-19): https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge.
 
