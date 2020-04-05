@@ -1,0 +1,57 @@
+# This yaml defines the subjects of interests (classes) for covid-paper.
+# It contains not only the subjects of interests, but also the synonyms of it
+# This is the basic but important keywords that we define for 
+# the subject of interest. We can furthur use nltk synompns library 
+# or word2vec this easily
+
+# level: class --> subclass --> keywords
+
+# Since we are using nltk to expand the synonyms. Some time, nltk
+# does not work well (e.g., "exercise" synonyms include "do"). Therefore
+# we will manually check and determine whether a sublcass should use
+# nltk to expand it
+
+risk_factor:
+    gender: 
+        kw: ['male', 'female' , 'gender']
+        allow_nltk_expand: True
+    age: 
+        kw: ['age']
+        allow_nltk_expand: false
+    disease_comorbidity: 
+        kw: ['disease comorbidity', 'comorbidity']
+        allow_nltk_expand: True
+    smoking: 
+        kw: ['smoking', 'smoke', 'tobacco']
+        allow_nltk_expand: False
+    exercise: 
+        kw: ['exercise', 'exercising', 'workout']
+        allow_nltk_expand: False
+    occupation: 
+        kw: ['occupation', 'employment status']
+        allow_nltk_expand: False
+    weather: 
+        kw: ['weather', 'temperature']
+        allow_nltk_expand: False
+        
+diagnostic:
+    imaging:
+        kw: []
+        allow_nltk_expand: True
+    
+treatment_and_vaccine:
+    treatment:
+        kw: []
+        allow_nltk_expand: True
+    
+outcome:
+    death_rate:
+        kw: []
+        allow_nltk_expand: True
+
+
+
+
+
+
+
