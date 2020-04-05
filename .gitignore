@@ -130,4 +130,5 @@ Data/
 # Ignore vs code
 .vscode/
 
-
+# microsoft word components
+*docx#
