@@ -56,7 +56,7 @@ if __name__ == "__main__":
         ##preprocessing the metadata csv which containts all papers info except main text
         cols_to_pre_proc = ['title','abstract']
         file = 'metadata.csv'
-        df = pd.read_csv('./Data/CORD-19-research-challenge/'+file)
+        df = pd.read_csv('..?data/'+file)
         df = nltkPreProcDf(df,cols_to_pre_proc)
         df.to_csv('./Data/'+file.replace('.csv','')+'_pre_proc.csv',index=False)
 
@@ -67,9 +67,9 @@ if __name__ == "__main__":
         ##preprocessing the metadata csv which containts all papers info except main text
         cols_to_pre_proc = ['title','abstract']
         file = 'metadata.csv'
-        df = pd.read_csv('./Data/CORD-19-research-challenge/'+file)
+        df = pd.read_csv('../../data/'+file)
         df = nltkPreProcDf(df,cols_to_pre_proc)
-        df.to_csv('./Data/'+file.replace('.csv','')+'_pre_proc.csv',index=False)
+        df.to_csv('../../Data/'+file.replace('.csv','')+'_pre_proc.csv',index=False)
 
 
         print('Analyzed corpora metadata with titles and abstracts only!')
