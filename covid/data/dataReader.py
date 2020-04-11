@@ -23,7 +23,7 @@ def getListOfFiles(path, extention=None):
 
 ############################### paths to files ############################
 
-path_all_archives = './Data/CORD-19-research-challenge/'
+path_all_archives = './'
 
 path_bioarxiv = 'biorxiv_medrxiv/biorxiv_medrxiv/'
 path_comm_use = 'comm_use_subset/comm_use_subset/'
