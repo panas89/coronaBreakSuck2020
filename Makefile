@@ -46,6 +46,10 @@ download_data:
 data: #requirements
 	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"]
 
+## Query Datasets
+query_data: #requirements
+	$(PYTHON_INTERPRETER) covid/data/query_data.py data/raw/ data/filtered/ metadata.csv ["title","abstract"]
+
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
