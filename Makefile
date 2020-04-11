@@ -10,6 +10,11 @@ PROFILE = default
 PROJECT_NAME = coronaBreakSuck2020
 PYTHON_INTERPRETER = python3
 
+# url to download data
+
+metadata_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-10/metadata.csv
+
+
 ifeq (,$(shell which conda))
 HAS_CONDA=False
 else
@@ -24,6 +29,11 @@ endif
 requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
+
+## Download datasets
+download_data:
+	@echo ">>> Downloading data from Semantic Scholar"
+	curl -o data/raw/metadata.csv $(metadata_DATA_URL)
 
 ## Make Dataset
 data: requirements
