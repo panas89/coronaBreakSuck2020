@@ -126,6 +126,7 @@ dmypy.json
 
 # Directories to be ignored
 Data/
+data/
 
 # Ignore vs code
 .vscode/
