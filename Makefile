@@ -13,6 +13,7 @@ PYTHON_INTERPRETER = python3
 # url to download data
 
 metadata_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-10/metadata.csv
+medrxiv_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-03/biorxiv_medrxiv.tar.gz
 
 
 ifeq (,$(shell which conda))
@@ -34,10 +35,16 @@ requirements: test_environment
 download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
 	curl -o data/raw/metadata.csv $(metadata_DATA_URL)
+	@echo ">>> Downloading data from Semantic Scholar"
+	curl -o data/raw/biorxiv_medrxiv.tar.gz $(medrxiv_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/biorxiv_medrxiv.tar.gz -C data/raw
+
 
 ## Make Dataset
-data: requirements
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+#getting raw json files, not for metadata but other arxivs
+data: #requirements
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"]
 
 ## Delete all compiled Python files
 clean:
