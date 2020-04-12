@@ -3,37 +3,43 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from preprocessing import DataProcessor
+from covid.models.query_model import *
 
 
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
 @click.argument('filename', type=click.Path())
-@click.argument('cols_to_preproc', type=click.Path())
-def main(input_filepath, output_filepath, filename, cols_to_preproc):
+@click.argument('cols_to_query', type=click.Path())
+def main(input_filepath, output_filepath, filename,cols_to_query):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
-    cols_to_preproc = cols_to_preproc.replace('[','').replace(']','').split(',')
-    preprocessor = DataProcessor(filename=filename,
-                                 cols_to_preproc=cols_to_preproc)
+    logger.info('generating risk factor and covid patterns')
+    cols_to_query = cols_to_query.replace('[','').replace(']','').split(',')
 
-    logger.info('reading data')
-    preprocessor.read_data(input_filepath)
+    cp = PatternGenerator(words=covid_words)
+    cp.generatePattern()
 
-    logger.info('processing data')
-    preprocessor.process_data()
+    rp = PatternGenerator(words=risk_factor_words)
+    rp.generatePattern()
+    
+    patterns = [rp.getPattern(),cp.getPattern()]
+    
+    logger.info('quering dataset' + filename)
+    queror = DataSearchByQueryEngine(filename=filename,
+                                     cols_to_query=cols_to_query,
+                                     patterns=patterns)
 
-    logger.info('saving raw data in csv format')
-    preprocessor.write_data(preprocessor.df,
-                            processed_data_path=output_filepath.replace('processed','raw'))
+    queror.read_data(input_filepath+filename)
 
-    logger.info('saving processed data')
-    preprocessor.write_data(preprocessor.df_preproc,
-                            processed_data_path=output_filepath)
+    queror.query_data()
+
+
+    logger.info('saving filtered data')
+    queror.write_data(queror.df_filtered,
+                      processed_data_path=output_filepath)
 
 
 if __name__ == '__main__':
