@@ -1,8 +1,11 @@
 from nltk.corpus import wordnet 
+from tqdm.notebook import tqdm
+
 import yaml
 import pandas as pd
 import numpy as np
 import nltk
+
 
 class PaperClassifier(object):
     def __init__(self, km_path='interest.yaml'):
@@ -26,19 +29,50 @@ class PaperClassifier(object):
             
         # Further expand the defined km keywords using nltk
         self._expand_keyword_lists()
+        
+    
+    def classify_all(self, df):
+        """
+        Classify a dataframe of abstracts into differenent categories based on keyword search
+        
+        :param df (pandas): the dataframe for all the abstracts. It should contain
+                            the 'title' and 'abstract' columns
+        """
+        # loop each row in the dataframe and do the classification
+        for i in tqdm(range(0, df.shape[0])):
+            s = df.iloc[i, :]
+            
+            # classify
+            classes, kws = self.classify(s)
+            
+        
+        
                 
             
-    def classify(self, doc):
+    def classify(self, s):
         """
         Classify a document the class and the subclass of it. As well as
         providing the keywords that link to it for the subclass
+        
         Class & subclasses: 
             risk_factor: gender, age, etc
             diagnostic
             treatment_and_vaccine
             outcome
+            
+        multiple steps to classify a paper:
+            1. Must contains coronavirus disease name in title or abtract
+            2. Search for the keywords for that appear in the abstract, and then return
+                all the keywords find
+            
+        :param s (pandas series): the pandas series for the paper information. It should contain
+                            the 'title' and 'abstract' columns
         """
-        pass
+        classes = []
+        kws = []
+        return classes, kws
+        
+        
       
             
     def get_km(self):
@@ -73,10 +107,15 @@ class PaperClassifier(object):
     def _expand_keyword_lists(self, ):
         """
         Expand the keyword lists using NLTK.
+        
         This is highly dependendt on how we know about the knowledge map.
         Also, we don't expand all the keyword list because NLTK cannot
         handle some keywords well. Therefore, we will just manually include them
         in the yaml, and make the flag 'allow_nltk_expand'=False
+        
+        TODO: assign from using NLTK, we can use other technique, such as using
+        embedding similarity calculation to find the keywords as well. We can
+        expand this method later.
         
         Level: class --> subclass --> keywords
         """
@@ -85,7 +124,7 @@ class PaperClassifier(object):
             for sc in subclasses:
                 if subclasses[sc]['allow_nltk_expand']:
                     # Retreives synonymps for keywords
-                    kws = subclasses[sc]['kw']
+                    kws = [w.lower() for w in subclasses[sc]['kw']]
                     kws_new = []
                     for kw in kws:
                         kws_new += self.expand_keyword(kw)
@@ -93,7 +132,7 @@ class PaperClassifier(object):
                     # Update the keywords list
                     subclasses[sc] = kws_new
                 else:
-                    subclasses[sc] = subclasses[sc]['kw']       
+                    subclasses[sc] = [w.lower() for w in subclasses[sc]['kw']]
     
     
         
