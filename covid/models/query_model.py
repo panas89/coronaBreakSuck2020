@@ -9,7 +9,7 @@ tqdm.pandas()
 
 ################################### global vars
 
-risk_factor_words = 'male | female | sex | gender'.split(' | ')
+risk_factor_words = 'male | female | sex | gender '.split('| ')
 
 covid_words = 'respiratory tract infection |virus infection |respiratory syncytial virus | \
                     lipopolysaccharide |death |acute respiratory distress syndrome |acute respiratory failure | \
