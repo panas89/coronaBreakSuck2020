@@ -20,6 +20,7 @@ def main(input_filepath, output_filepath, filename,cols_to_query):
     cols_to_query = cols_to_query.replace('[','').replace(']','').split(',')
 
     cp = PatternGenerator(words=covid_words)
+    cp.addSynonyms()
     cp.generatePattern()
 
     rp = PatternGenerator(words=risk_factor_words)
