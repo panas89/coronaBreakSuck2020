@@ -31,6 +31,10 @@ disease_name:
         allow_nltk_expand: False
 
 risk_factor:
+    common_name:
+        kw: ['risk factor']
+        allow_nltk_expand: False
+        
     gender: 
         kw: ['male', 'female' , 'gender']
         allow_nltk_expand: True
@@ -54,7 +58,11 @@ risk_factor:
         allow_nltk_expand: False
         
 diagnostic:
-    symptoms: 
+    common_name: 
+        kw: ['symptom']
+        allow_nltk_expand: False
+    
+    symptom: 
         kw: ['fever', 'dry cough', 'lose of smell', 'difficult to breath', 'hard to breath', 
              'shortness of breath', 'headaches', 'aches and pains', 'sore throat', 'fatigue',
              'diarrhea', 'running nose', 'sneezing', 'cough']
@@ -85,11 +93,19 @@ diagnostic:
         allow_nltk_expand: False
     
 treatment_and_vaccine:
-    treatment:
+    common_name: 
         kw: ['treatment', 'vaccine', 'intervention']
+        allow_nltk_expand: False
+
+    treatment:
+        kw: []
         allow_nltk_expand: False
     
 outcome:
+    common_name: 
+        kw: ['outcome']
+        allow_nltk_expand: False
+
     outcome:
         kw: ['death', 'death rate', 'recovery rate', 'mobility', 'lung damage', 
         'lung capacity', 'length of survival', 'hospitalization','sepus', 'discharge',
