@@ -30,6 +30,14 @@ class PaperClassifier(object):
         # Further expand the defined km keywords using nltk
         self._expand_keyword_lists()
         
+        
+    def preprocess(self, df):
+        """
+        Preprocess the abstract dataframe
+        """
+        df.dropna()
+        
+        
     
     def classify_all(self, df):
         """
@@ -70,6 +78,15 @@ class PaperClassifier(object):
         """
         classes = []
         kws = []
+        print(s['abstract'])
+
+        # check if the abstract fullfill the criteria
+        disease_names = self.km['disease_name']['common_name']
+        if (any(word in s['title'] for word in disease_names) or
+            any(word in s['abstract'] for word in disease_names)):
+                
+        
+        
         return classes, kws
         
         
