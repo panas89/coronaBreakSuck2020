@@ -109,13 +109,28 @@ def convert_to_timestamps(df, col):
                     pass
     
     # replace raw datetimes of input col with Timestamps
-    df[col] = pd.Series(clean_dates)
+    df[col] = pd.to_datetime(pd.Series(clean_dates))
 
     return df
     
+def normalize_future_dates(df, col):
+    """ Method to set the date of all papers with timestamps in the future to today.
+    e.g. 2020-12-31 ----> today
+    """
+
+    # collect ids of papers with timestamps in the future
+    today = pd.Timestamp(datetime.date(datetime.now()))
+    future_date_ids = df[df.publish_time > today].index
+
+    print("Fraction of papers with MISSING dates: {}/{}".format(len(future_date_ids), len(df)))
+
+    # replace future dates with today
+    df.loc[future_date_ids, col] = today
+
+    return df
 
 
-def datetimeCleanerPipe(df, col):
+def datetimeCleanerPipe(df, col, normalize_future=True):
     """ Method to clean datetime col and convert differnt date formats to timestamps.
         Replaces input datetime col with Timestamps.
     """
@@ -123,5 +138,9 @@ def datetimeCleanerPipe(df, col):
     df = convert_list_to_date(df, col)
     df = convert_season_to_month(df, col)
     df = convert_to_timestamps(df, col)
+
+    # set value of future timestamps to today
+    if normalize_future:
+        df = normalize_future_dates(df, col)
 
     return df
