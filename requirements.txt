@@ -1,7 +1,8 @@
 beautifulsoup4==4.8.2
 bs4==0.0.1
+click==7.1.1
 contractions==0.0.24
--e git+https://github.com/panas89/coronaBreakSuck2020.git@155f190f61d1d01399a86c4daec1566d7d5f43a6#egg=covid
+-e git+https://github.com/panas89/coronaBreakSuck2020.git@a0ee41ed5a121f98424a21999c173bf21a264f4c#egg=covid
 importlib-metadata==1.6.0
 inflect==4.1.0
 nltk==3.4.5
@@ -9,6 +10,7 @@ numpy==1.18.2
 pandas==1.0.3
 pyahocorasick==1.4.0
 python-dateutil==2.8.1
+python-dotenv==0.12.0
 pytz==2019.3
 six==1.14.0
 soupsieve==2.0
