@@ -3,12 +3,19 @@ from nltk.corpus import wordnet
 import re
 import pandas as pd
 import numpy as np
+from covid.models.paperclassifier.frontpaperclassifier import FrontPaperClassifier
 
 from tqdm import tqdm
 tqdm.pandas()
 
-################################### global vars
+#-------------------- GLOBAL VARS -----------------------------
 
+from covid.data.constants import COVID_WORDS
+
+YAML_PATH = '../covid/models/paperclassifier/interest.yaml'
+fpc = FrontPaperClassifier(km_path=YAML_PATH)
+
+# TO-BE DEPRECIATED!!!
 risk_factor_words = 'male | female | sex | gender '.split('| ')
 
 covid_words = 'respiratory tract infection |virus infection |respiratory syncytial virus | \
@@ -27,9 +34,7 @@ covid_words = 'respiratory tract infection |virus infection |respiratory syncyti
                     infection of the central nervous system |\
                     infection of the pulmonary parenchyma |covid | coronavirus'.split(' |')
 
-
-
-#################################### methods
+#-------------------- METHODS -----------------------------
 
 
 def getSynonymsAntonymns(word):
@@ -92,6 +97,11 @@ def regexQueryDf(df,cols,patterns,operatorPattern='AND',operatorColumn='OR'):
             cond = cond | (df.progress_apply(lambda row: row[cols].str.contains(pattern).fillna(False).any(),axis=1))
         return cond
 
+
+
+
+#-------------------- CLASSES -----------------------------
+
 class DataSearchByQueryEngine:
     """
     Class for reading, processing, and writing data from the
@@ -126,6 +136,29 @@ class DataSearchByQueryEngine:
         df.to_csv(processed_data_path+self.filename,
                     index=False)
 
+
+
+class FrontDataSearchByQueryEngine(DataSearchByQueryEngine):
+
+    def __init__(self, filename, cols_to_query, subclass):
+
+        self.subclass = subclass
+        self.keywords = self._get_keywords_from_subclass()
+        self.patterns = [self._generatePattern(COVID_WORDS), 
+                         self._generatePattern(self.keywords)]
+
+        super().__init__(filename, cols_to_query, self.patterns)
+
+
+    def _generatePattern(self, words):
+        pattern = ' | '.join(words)
+        return pattern.replace(' |','|(?i)') #regex
+
+    def _get_keywords_from_subclass(self):
+        return fpc.get_keywords(self.subclass)
+
+        
+
 class PatternGenerator:
 
     def __init__(self,words):
@@ -147,6 +180,13 @@ class PatternGenerator:
 
     def getPattern(self):
         return self.pattern
+
+
+
+
+
+
+
 
 ############################################################################################################
 
