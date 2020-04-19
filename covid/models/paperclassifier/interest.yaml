@@ -33,8 +33,7 @@ disease_name:
 risk_factor:
     common_name:
         kw: ['risk factor']
-        allow_nltk_expand: False
-        
+        allow_nltk_expand: False  
     gender: 
         kw: ['male', 'female' , 'gender']
         allow_nltk_expand: True
