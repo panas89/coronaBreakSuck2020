@@ -1,5 +1,6 @@
 from nltk.corpus import wordnet 
 from tqdm.notebook import tqdm
+from collections import defaultdict
 
 import yaml
 import pandas as pd
@@ -33,9 +34,10 @@ class PaperClassifier(object):
         
     def preprocess(self, df):
         """
-        Preprocess the abstract dataframe
+        Preprocess the title and abstract dataframe particularly for the meta information. 
         """
-        df.dropna()
+        # 
+        pass
         
         
     
@@ -84,10 +86,25 @@ class PaperClassifier(object):
         disease_names = self.km['disease_name']['common_name']
         if (any(word in s['title'] for word in disease_names) or
             any(word in s['abstract'] for word in disease_names)):
-                
+            pass
         
         
         return classes, kws
+    
+    
+    def match_keywords(s, kws):
+        """
+        Give a string s, dind the keyword(s) that appear in kws and caclulate the occurance as well.
+        
+        :param s (string): a sentece
+        :param kws (list): a list of keywords
+        """
+        kws_match = defaultdict()
+        for token in s:
+            print(token)
+            
+        
+        
         
         
       
