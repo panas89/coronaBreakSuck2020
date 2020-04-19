@@ -45,70 +45,36 @@ class PaperClassifier(object):
         """
         Classify a dataframe of abstracts into differenent categories based on keyword search
         
+        There is a performance issue for using regular expression in panda dataFrae.str.contains().
+        See: https://stackoverflow.com/questions/37894003/how-to-make-pandas-dataframe-str-contains-search-faster. 
+        I will change the way we use the regexQueryDf in query_model.py
+        
         :param df (pandas): the dataframe for all the abstracts. It should contain
                             the 'title' and 'abstract' columns
         """
-        # loop each row in the dataframe and do the classification
-        for i in tqdm(range(0, df.shape[0])):
-            s = df.iloc[i, :]
-            
-            # classify
-            classes, kws = self.classify(s)
-            
+        cols = ['title', 'abstract']
         
+        # ---------------- Identify if the paper is related to covid19 first
+        kws = self.km['disease_name']['common_name']
+        has_dnames = []
+        for _, row in tqdm(df.iterrows()):
+            print(row['title'])
+            print(row['abstract'])
+            if (any(w in row['title'] for w in kws) or
+                any(w in row['abstract'] for w in kws)):
+                    continue
+            else:
+                has_dnames.append(False)
+        return(has_dnames)
         
-                
-            
-    def classify(self, s):
-        """
-        Classify a document the class and the subclass of it. As well as
-        providing the keywords that link to it for the subclass
-        
-        Class & subclasses: 
-            risk_factor: gender, age, etc
-            diagnostic
-            treatment_and_vaccine
-            outcome
-            
-        multiple steps to classify a paper:
-            1. Must contains coronavirus disease name in title or abtract
-            2. Search for the keywords for that appear in the abstract, and then return
-                all the keywords find
-            
-        :param s (pandas series): the pandas series for the paper information. It should contain
-                            the 'title' and 'abstract' columns
-        """
-        classes = []
-        kws = []
-        print(s['abstract'])
 
-        # check if the abstract fullfill the criteria
-        disease_names = self.km['disease_name']['common_name']
-        if (any(word in s['title'] for word in disease_names) or
-            any(word in s['abstract'] for word in disease_names)):
-            pass
+
         
         
-        return classes, kws
+        
+        
+        
     
-    
-    def match_keywords(s, kws):
-        """
-        Give a string s, dind the keyword(s) that appear in kws and caclulate the occurance as well.
-        
-        :param s (string): a sentece
-        :param kws (list): a list of keywords
-        """
-        kws_match = defaultdict()
-        for token in s:
-            print(token)
-            
-        
-        
-        
-        
-      
-            
     def get_km(self):
         """
         Return the knowledge map (km)
@@ -169,7 +135,53 @@ class PaperClassifier(object):
                     subclasses[sc] = [w.lower() for w in subclasses[sc]['kw']]
     
     
+    
+    
+    
+# ======================================== Soon to be abandon functions
+    def classify(self, s):
+        """
+        Classify a document the class and the subclass of it. As well as
+        providing the keywords that link to it for the subclass
         
+        Class & subclasses: 
+            risk_factor: gender, age, etc
+            diagnostic
+            treatment_and_vaccine
+            outcome
+            
+        multiple steps to classify a paper:
+            1. Must contains coronavirus disease name in title or abtract
+            2. Search for the keywords for that appear in the abstract, and then return
+                all the keywords find
+            
+        :param s (pandas series): the pandas series for the paper information. It should contain
+                            the 'title' and 'abstract' columns
+        """
+        classes = []
+        kws = []
+        print(s['abstract'])
+
+        # check if the abstract fullfill the criteria
+        disease_names = self.km['disease_name']['common_name']
+        if (any(word in s['title'] for word in disease_names) or
+            any(word in s['abstract'] for word in disease_names)):
+            pass
+        
+        
+        return classes, kws
+    
+    
+    def match_keywords(s, kws):
+        """
+        Give a string s, dind the keyword(s) that appear in kws and caclulate the occurance as well.
+        
+        :param s (string): a sentece
+        :param kws (list): a list of keywords
+        """
+        kws_match = defaultdict()
+        for token in s:
+            print(token)
         
         
         
