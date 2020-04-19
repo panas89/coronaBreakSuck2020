@@ -130,7 +130,7 @@ def normalize_future_dates(df, col):
 
     # collect ids of papers with timestamps in the future
     today = pd.Timestamp(datetime.date(datetime.now()))
-    future_date_ids = df[df.publish_time > today].index
+    future_date_ids = df[df[col] > today].index
 
     print("Fraction of papers with FUTURE dates: {}/{}".format(len(future_date_ids), len(df)))
 
