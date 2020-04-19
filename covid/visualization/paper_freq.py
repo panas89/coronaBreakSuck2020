@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style("whitegrid")
 
-from ..data.constants import *
-from ..models.query_model import regexQueryDf
-from ..models.paperclassifier.frontpaperclassifier import FrontPaperClassifier
+from covid.data.constants import *
+from covid.models.query_model import regexQueryDf,PatternGenerator
+from covid.models.paperclassifier.frontpaperclassifier import FrontPaperClassifier
 
 YAML_PATH = '../covid/models/paperclassifier/interest.yaml'
 USECOLS = ['title', 'abstract', 'publish_time']
@@ -33,10 +33,25 @@ def compute_paper_freq(file_path, subclass):
 
     df.dropna(subset=['publish_time'], inplace=True)
 
+    #####################################################
     # Define keyword patterns to filter papers out
-    keywords_pattern = ' | '.join(fpc.get_keywords(subclass)).replace('| ','|(?i)')
-    covid_pattern = ' | '.join(COVID_WORDS).replace(' |','|(?i)')
-    patterns = [keywords_pattern, covid_pattern]
+    cp = PatternGenerator(words=COVID_WORDS)
+    cp.generatePattern()
+
+    rp = PatternGenerator(words=fpc.get_keywords(subclass))
+    rp.generatePattern()
+    
+    patterns = [rp.getPattern(),cp.getPattern()]
+
+    #####################################################
+    ## query data
+    queror = DataSearchByQueryEngine(filename=filename,
+                                     cols_to_query=USECOLS,
+                                     patterns=patterns)
+
+    queror.read_data(file_path)
+
+    queror.query_data()
 
     # select papers that match both keywords and covid pattern,
     # at either column ['title', 'abstract']
