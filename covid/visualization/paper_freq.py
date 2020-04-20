@@ -9,56 +9,28 @@ from covid.models.query_model import regexQueryDf,PatternGenerator
 from covid.models.paperclassifier.frontpaperclassifier import FrontPaperClassifier
 
 YAML_PATH = '../covid/models/paperclassifier/interest.yaml'
-USECOLS = ['title', 'abstract', 'publish_time']
+USECOLS = ['title', 'abstract']
 
 # Instantiate FrontPaperClassifier; to be used for keywords retrieval
 fpc = FrontPaperClassifier(km_path=YAML_PATH)
 
-def compute_paper_freq(file_path, subclass):
+def compute_paper_freq(file_path,subclass):
     """ Method to compute annual frequencies of paper publications that much the keywords
         of the input subclass. 
         
         Input:
-            - file_path: path to data; must be PRE-PROCESSED and have the right format.
-            - subclass: string that matches one of the pre-defined subclasses of the YAML file
+            - file_path: path to filtered data
         Output:
             df with:
                 - index = years 
                 - data = no of papers published per year that also much subclass's keywords
     """
-
-    df = pd.read_csv(file_path, usecols=USECOLS, parse_dates=['publish_time'])
+    
+    df = pd.read_csv(file_path,parse_dates=['publish_time'])
     NO_PAPERS = len(df)
     num_nans = df.publish_time.isnull().sum()
 
-    df.dropna(subset=['publish_time'], inplace=True)
-
-    #####################################################
-    # Define keyword patterns to filter papers out
-    cp = PatternGenerator(words=COVID_WORDS)
-    cp.generatePattern()
-
-    rp = PatternGenerator(words=fpc.get_keywords(subclass))
-    rp.generatePattern()
-    
-    patterns = [rp.getPattern(),cp.getPattern()]
-
-    #####################################################
-    ## query data
-    queror = DataSearchByQueryEngine(filename=filename,
-                                     cols_to_query=USECOLS,
-                                     patterns=patterns)
-
-    queror.read_data(file_path)
-
-    queror.query_data()
-
-    # select papers that match both keywords and covid pattern,
-    # at either column ['title', 'abstract']
-    cond = regexQueryDf(df, ['title','abstract'], patterns, 
-                        operatorPattern='AND', operatorColumn='OR')
-
-    df_filtered = df[cond]
+    df_filtered = df[~df.publish_time.isnull()].reset_index(drop=True)
 
     print("Dropped papers with MISSING dates: {}/{}"
           .format(num_nans, NO_PAPERS))

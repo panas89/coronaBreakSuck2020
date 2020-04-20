@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from .paperclassifier import PaperClassifier
+from covid.models.paperclassifier.paperclassifier import PaperClassifier
 
 class FrontPaperClassifier(PaperClassifier):
     
