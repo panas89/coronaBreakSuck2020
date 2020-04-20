@@ -50,3 +50,4 @@ COVID_WORDS = ['respiratory tract infection',
  'infection of the pulmonary parenchyma',
  'covid',
  'coronavirus']
+

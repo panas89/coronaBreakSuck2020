@@ -10,6 +10,9 @@ PROFILE = default
 PROJECT_NAME = coronaBreakSuck2020
 PYTHON_INTERPRETER = python3
 
+#yaml path
+YAML_PATH = covid/models/paperclassifier/interest.yaml
+
 # url to download data
 
 metadata_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-10/metadata.csv
@@ -44,11 +47,12 @@ download_data:
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
 data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"]
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/ data/processed/ metadata.csv ["title","abstract"] True
 
 ## Query Datasets
 query_data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/query_data.py data/raw/ data/filtered/ metadata.csv ["title","abstract"]
+	$(PYTHON_INTERPRETER) covid/data/query_data.py data/processed/ data/filtered/ metadata.csv ["title","abstract"] $(YAML_PATH) gender
 
 ## Delete all compiled Python files
 clean:

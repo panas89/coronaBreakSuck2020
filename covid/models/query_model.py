@@ -8,32 +8,6 @@ from covid.models.paperclassifier.frontpaperclassifier import FrontPaperClassifi
 from tqdm import tqdm
 tqdm.pandas()
 
-#-------------------- GLOBAL VARS -----------------------------
-
-from covid.data.constants import COVID_WORDS
-
-YAML_PATH = '../covid/models/paperclassifier/interest.yaml'
-fpc = FrontPaperClassifier(km_path=YAML_PATH)
-
-# TO-BE DEPRECIATED!!!
-risk_factor_words = 'male | female | sex | gender '.split('| ')
-
-covid_words = 'respiratory tract infection |virus infection |respiratory syncytial virus | \
-                    lipopolysaccharide |death |acute respiratory distress syndrome |acute respiratory failure | \
-                    H1N1 viral infection |rubella virus infection |influenza virus infection |human immunodeficiency virus | \
-                    irritation of the respiratory tract |Zika Virus Infection |Ebola and Zika virus infection | \
-                    porcine reproductive and respiratory syndrome |TAP |influenza virus A |Thrombocytopenia Syndrome Virus Infection | \
-                    SARS-CoV-2 |respiratory syncitial virus |skin or mucous membrane lesions |upper respiratory infection | \
-                    H5N1 viral infection |herpes simplex virus type 1 |human immunodeficiency virus type 1 |gastrointestinal viral infection | \
-                    reproductive and respiratory syndrome virus infection |porcine reproductive and respiratory syndrome virus | \
-                    hepatitis A virus |acquired immunodeficiency syndrome |parainfluenza virus 3 | \
-                    nosocomial viral respiratory infections |coronavirus OC43 infection |IFN |H3N2 virus infection | \
-                    dsRNA |dsDNA |long QT syndrome |liver cell necrosis |latent TB infection |Pulmonary Coronavirus Infection | \
-                    Dengue virus Type |neurotropic coronavirus virus |Leukocyte adhesion deficiency II syndrome | \
-                    Human T-cell leukemia virus type 1 |Human T-cell leukemia virus type | \
-                    infection of the central nervous system |\
-                    infection of the pulmonary parenchyma |covid | coronavirus'.split(' |')
-
 #-------------------- METHODS -----------------------------
 
 
@@ -138,24 +112,24 @@ class DataSearchByQueryEngine:
 
 
 
-class FrontDataSearchByQueryEngine(DataSearchByQueryEngine):
+# class FrontDataSearchByQueryEngine(DataSearchByQueryEngine):
 
-    def __init__(self, filename, cols_to_query, subclass):
+#     def __init__(self, filename, cols_to_query, subclass):
 
-        self.subclass = subclass
-        self.keywords = self._get_keywords_from_subclass()
-        self.patterns = [self._generatePattern(COVID_WORDS), 
-                         self._generatePattern(self.keywords)]
+#         self.subclass = subclass
+#         self.keywords = self._get_keywords_from_subclass()
+#         self.patterns = [self._generatePattern(COVID_WORDS), 
+#                          self._generatePattern(self.keywords)]
 
-        super().__init__(filename, cols_to_query, self.patterns)
+#         super().__init__(filename, cols_to_query, self.patterns)
 
 
-    def _generatePattern(self, words):
-        pattern = ' | '.join(words)
-        return pattern.replace(' |','|(?i)') #regex
+#     def _generatePattern(self, words):
+#         pattern = ' | '.join(words)
+#         return pattern.replace(' |','|(?i)') #regex
 
-    def _get_keywords_from_subclass(self):
-        return fpc.get_keywords(self.subclass)
+#     def _get_keywords_from_subclass(self):
+#         return fpc.get_keywords(self.subclass)
 
         
 
