@@ -92,8 +92,14 @@ def convert_to_timestamps(df, col):
     """ Method to convert various differnt date formats to timestamps.
         Replaces input datetime col with Timestamps.
     """
+    NUM_PAPERS = len(df)
+    NUM_NULLS = df.publish_time.isnull().sum()
+    NUM_BAD_TIMESTAMPS = pd.to_datetime(df.publish_time).isnull().sum() - NUM_NULLS
 
-  
+    print("Fraction of papers with MISSING dates: {}/{}".format(NUM_NULLS, NUM_PAPERS))
+    print("Fraction of papers with BAD dates BEFORE pre-processing: {}/{}"
+          .format(NUM_BAD_TIMESTAMPS, NUM_PAPERS))
+
     # loop through all pre-defined datetime string formats, 
     # convert values to timestamps and store them in an (df index, timestamp) dict
     clean_dates = {}
@@ -111,6 +117,10 @@ def convert_to_timestamps(df, col):
     # replace raw datetimes of input col with Timestamps
     df[col] = pd.to_datetime(pd.Series(clean_dates))
 
+    NUM_BAD_TIMESTAMPS = df.publish_time.isnull().sum() - NUM_NULLS
+    print("Fraction of papers with BAD dates AFTER pre-processing: {}/{}"
+          .format(NUM_BAD_TIMESTAMPS, NUM_PAPERS))
+
     return df
     
 def normalize_future_dates(df, col):
@@ -122,7 +132,7 @@ def normalize_future_dates(df, col):
     today = pd.Timestamp(datetime.date(datetime.now()))
     future_date_ids = df[df.publish_time > today].index
 
-    print("Fraction of papers with MISSING dates: {}/{}".format(len(future_date_ids), len(df)))
+    print("Fraction of papers with FUTURE dates: {}/{}".format(len(future_date_ids), len(df)))
 
     # replace future dates with today
     df.loc[future_date_ids, col] = today
@@ -134,13 +144,28 @@ def datetimeCleanerPipe(df, col, normalize_future=True):
     """ Method to clean datetime col and convert differnt date formats to timestamps.
         Replaces input datetime col with Timestamps.
     """
+    try:
+        df = convert_list_to_date(df, col)
+    except:
+        raise Exception("Something went bad with: convert_list_to_date.")
 
-    df = convert_list_to_date(df, col)
-    df = convert_season_to_month(df, col)
-    df = convert_to_timestamps(df, col)
+    try:
+        df = convert_season_to_month(df, col)
+    except:
+        raise Exception("Something went bad with: convert_season_to_month.")
+
+    try:
+        df = convert_to_timestamps(df, col)
+    except:
+        raise Exception("Something went bad with: convert_to_timestamps.")
+  
 
     # set value of future timestamps to today
     if normalize_future:
-        df = normalize_future_dates(df, col)
+        try:
+            df = normalize_future_dates(df, col)
+        except:
+            raise Exception("Something went bad with: normalize_future_dates.")
+    
 
     return df
