@@ -11,7 +11,8 @@ from preprocessing import DataProcessor
 @click.argument('output_filepath', type=click.Path())
 @click.argument('filename', type=click.Path())
 @click.argument('cols_to_preproc', type=click.Path())
-def main(input_filepath, output_filepath, filename, cols_to_preproc):
+@click.argument('only_dates', type=click.Path())
+def main(input_filepath, output_filepath, filename, cols_to_preproc, only_dates):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -22,10 +23,17 @@ def main(input_filepath, output_filepath, filename, cols_to_preproc):
                                  cols_to_preproc=cols_to_preproc)
 
     logger.info('reading data')
-    preprocessor.read_data(input_filepath)
+    if 'json' in input_filepath:
+        preprocessor.read_json_data(input_filepath)
+    else:
+        preprocessor.read_csv_data(input_filepath)
+
 
     logger.info('processing data')
-    preprocessor.process_data()
+    if only_dates == 'True':
+        preprocessor.process_dates()
+    else:
+        preprocessor.process_data()
 
     logger.info('saving raw data in csv format')
     preprocessor.write_data(preprocessor.df,

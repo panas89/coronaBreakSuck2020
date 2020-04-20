@@ -2,7 +2,9 @@ import ast
 from datetime import datetime
 import re
 import pandas as pd
-import numpy as np 
+import numpy as np
+from tqdm import tqdm
+tqdm.pandas()
 
 #----------------------------------
 #              INTRO
@@ -57,7 +59,7 @@ def convert_list_to_date(df, col):
     e.g. "['2020-02-05', '2020-02']" -----> '2020-02-05'
     """
 
-    df[col] = df[col].apply(lambda x: ast.literal_eval(x)[0] 
+    df[col] = df[col].progress_apply(lambda x: ast.literal_eval(x)[0] 
                                       if isinstance(x,str) and x.startswith("[") 
                                       else x)
     return df
@@ -78,7 +80,7 @@ def convert_season_to_month(df, col):
     raw_dates = df[col].str.findall(regex).to_dict()
 
     # replace Season with month value from season_to_month dict
-    for index, date in raw_dates.items():
+    for index, date in tqdm(raw_dates.items()):
         if isinstance(date,list) and date!=[]:
             year, season = tuple(date[0].split())
             raw_date = year + " " + season_to_month[season]
@@ -103,14 +105,14 @@ def convert_to_timestamps(df, col):
     # loop through all pre-defined datetime string formats, 
     # convert values to timestamps and store them in an (df index, timestamp) dict
     clean_dates = {}
-    for pattern, DateFormat in pattern_to_DateFormat.items():
+    for pattern, DateFormat in tqdm(pattern_to_DateFormat.items()):
         regex = re.compile(pattern, flags=re.IGNORECASE)
         raw_dates = df[col].str.findall(regex).to_dict()
         for index, v in raw_dates.items():
             if isinstance(v,list) and v!=[]: #ignore NaNs (floats)
                 raw_date = v[0]
                 try:
-                    clean_dates[index] = pd.to_datetime(raw_date, format = DateFormat)
+                    clean_dates[index] = pd.to_datetime(raw_date, format = DateFormat, errors='coerce')
                 except:
                     pass
     
@@ -130,7 +132,7 @@ def normalize_future_dates(df, col):
 
     # collect ids of papers with timestamps in the future
     today = pd.Timestamp(datetime.date(datetime.now()))
-    future_date_ids = df[df.publish_time > today].index
+    future_date_ids = df[df[col] > today].index
 
     print("Fraction of papers with FUTURE dates: {}/{}".format(len(future_date_ids), len(df)))
 
@@ -144,6 +146,7 @@ def datetimeCleanerPipe(df, col, normalize_future=True):
     """ Method to clean datetime col and convert differnt date formats to timestamps.
         Replaces input datetime col with Timestamps.
     """
+
     try:
         df = convert_list_to_date(df, col)
     except:
