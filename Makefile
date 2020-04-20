@@ -44,7 +44,8 @@ download_data:
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
 data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"]
+	# $(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/ data/processed/ metadata.csv ["title","abstract"] True
 
 ## Query Datasets
 query_data: #requirements
