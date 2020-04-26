@@ -15,7 +15,7 @@
 # https://drive.google.com/file/d/1ZaiDO87me4puBte-8VytcSRtpQ3PVpkK/view?fbclid=IwAR1bf4S36gyjLXt-HpTpShOVdpY6OcZIh5yDe7RlkrM5SY6MB9q1ZLbii3A
 
 disease_name:
-    common_name:
+    disease_common_name:
         kw: ['covid', 'sars-cov-2', 'covid19', 'coronavirus']
         allow_nltk_expand: False
     relate_to:
@@ -31,7 +31,7 @@ disease_name:
         allow_nltk_expand: False
 
 risk_factor:
-    common_name:
+    risk_factor_common_name:
         kw: ['risk factor']
         allow_nltk_expand: False  
     gender: 
@@ -57,7 +57,7 @@ risk_factor:
         allow_nltk_expand: False
         
 diagnostic:
-    common_name: 
+    diagnostic_common_name: 
         kw: ['symptom']
         allow_nltk_expand: False
     
@@ -92,7 +92,7 @@ diagnostic:
         allow_nltk_expand: False
     
 treatment_and_vaccine:
-    common_name: 
+    treatment_and_vaccine_common_name: 
         kw: ['treatment', 'vaccine', 'intervention']
         allow_nltk_expand: False
 
@@ -101,7 +101,7 @@ treatment_and_vaccine:
         allow_nltk_expand: False
     
 outcome:
-    common_name: 
+    outcome_common_name: 
         kw: ['outcome']
         allow_nltk_expand: False
 
