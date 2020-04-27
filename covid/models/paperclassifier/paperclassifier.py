@@ -80,7 +80,6 @@ class PaperClassifier(object):
             else:
                 has_dnames.append(False)
         df['covid_related'] = has_dnames
-        print(df['covid_related'].sum())
         
         # ---------------- Classify paper into categories
         # ----- create new columns for classes, subclasses, keywords in dataframe first
@@ -91,32 +90,31 @@ class PaperClassifier(object):
         
         # ----- classify
         for i in tqdm(range(0, df.shape[0])):
-            if df.loc[i, 'covid_related'] == True:
-                kws_found = self._find_kws(df.loc[i, 'abstract'], kws_all)
-                if kws_found:
-                    # assign the label into the df 
-                    relevant_cols = self._get_relevant_info(kws_found, subclasses, 
-                                                            subclasses_kws,)
-                    df.loc[i, 'keywords'] = ",".join(kws_found)
-                    df.loc[i, relevant_cols] = 1
+            kws_found = self._find_kws(df.loc[i, 'abstract'], kws_all)
+            if kws_found:
+                # assign the label into the df 
+                relevant_cols = self._get_relevant_info(kws_found, subclasses, 
+                                                        subclasses_kws,)
+                df.loc[i, 'keywords'] = ",".join(kws_found)
+                df.loc[i, relevant_cols] = 1
         return df
                                    
 
     def get_km_info(self):
         """
-        Obtain structured information from the keyword map yaml file.
+        Obtain structured information from the knowledge map yaml file.
         
         This information is somewhat the "reverse" structure of the 
-        keyword map. E.g., {male:gender}, {gender:risk_factor}, {risk_factor}
+        knowledge map. E.g., {male:gender}, {gender:risk_factor}, {risk_factor}
         
         Note: there should not be overlap between keywords (kws) between
              classes-subclasses. If so, that mean the manually defined 
-             keyword map is not good. And we need to change the yaml.
+             knowledge map is not good. And we need to change the yaml.
         
         return classes (list): the major classes, e.g., risk_factor
                 subclasses (dict): the subclasses and which classes each belong to,
                             e.g., {gender:risk_factor}
-                subclasses_kws (dict): the subclasses' that a keyword map to, 
+                subclasses_kws (dict): the subclasses' that a knowledge map to, 
                             e.g., {male:gender}
                 kws (list): a list of all possible keywords
         """
@@ -215,7 +213,7 @@ class PaperClassifier(object):
                             value of the dict sublcasses_kws
                 subclasses (dict): the subclasses and which classes each belong to,
                             e.g., {gender:risk_factor}
-                subclasses_kws (dict): the subclasses' that a keyword map to, 
+                subclasses_kws (dict): the subclasses' that a knowledge map to, 
                                         e.g., {male:gender}
         :return a list of class and subclass names that are relvant to the list of keywords
         """
