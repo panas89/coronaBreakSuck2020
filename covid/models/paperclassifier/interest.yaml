@@ -39,7 +39,7 @@ risk_factor:
         allow_nltk_expand: True
     age: 
         kw: ['age']
-        allow_nltk_expand: false
+        allow_nltk_expand: False
     disease_comorbidity: 
         kw: ['disease comorbidity', 'comorbidity']
         allow_nltk_expand: True
@@ -105,7 +105,7 @@ outcome:
         kw: ['outcome']
         allow_nltk_expand: False
 
-    outcome:
+    clinical_outcome:
         kw: ['death', 'death rate', 'recovery rate', 'mobility', 'lung damage', 
         'lung capacity', 'length of survival', 'hospitalization','sepus', 'discharge',
         'clinical outcome']

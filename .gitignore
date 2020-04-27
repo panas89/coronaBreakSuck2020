@@ -133,3 +133,6 @@ data/
 
 # microsoft word components
 *docx#
+
+# johnny personal file
+notebooks/main_kch_tmp.ipynb
