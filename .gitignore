@@ -126,10 +126,13 @@ dmypy.json
 
 # Directories to be ignored
 Data/
-#data/
+data/
 
 # Ignore vs code
 .vscode/
 
 # microsoft word components
 *docx#
+
+# johnny personal file
+notebooks/main_kch_tmp.ipynb
