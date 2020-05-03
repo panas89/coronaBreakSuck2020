@@ -165,6 +165,22 @@ class PaperClassifier(object):
         synonyms = [w.replace("_", " ") for w in synonyms]
         return synonyms
         
+
+    def query_paper_by_class(self, df, cols):
+        """
+        Return all the paper ids that are related to a list of provided 
+        classes and subclasses.
+        
+        :param df (DataFrame): a dataframe that contains the abstract, title, etc
+                                and classified classes and subclasses
+        :param cols (list): a list of interested classes/subclasses names
+        :return a dataframe
+        """
+        df = df.copy(deep=True)
+        for c in cols:
+            df = df.loc[df[c]==1]
+        return df
+        
         
     def _configure_nltk(self):
         """
