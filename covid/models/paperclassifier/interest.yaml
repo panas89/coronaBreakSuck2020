@@ -11,13 +11,35 @@
 # we will manually check and determine whether a sublcass should use
 # nltk to expand it
 
+# Here is the list of resources:
+# https://drive.google.com/file/d/1ZaiDO87me4puBte-8VytcSRtpQ3PVpkK/view?fbclid=IwAR1bf4S36gyjLXt-HpTpShOVdpY6OcZIh5yDe7RlkrM5SY6MB9q1ZLbii3A
+
+disease_name:
+    disease_common_name:
+        kw: ['covid', 'sars-cov-2', 'covid19', 'coronavirus']
+        allow_nltk_expand: False
+    relate_to:
+        kw: ['respiratory syncytial virus', 'lipopolysaccharide', 
+             'rubella virus infection', 'human immunodeficiency virus', 'Zika Virus Infection',
+             'Ebola and Zika virus infection', 'influenza virus A', 
+             'Thrombocytopenia Syndrome Virus Infection', 'respiratory syncitial virus',
+             'herpes simplex virus type 1', 'human immunodeficiency virus type 1', 
+             'porcine reproductive and respiratory syndrome virus', 'hepatitis A virus',
+             'parainfluenza virus 3', 'neurotropic coronavirus virus', 
+             'Human T-cell leukemia virus type 1', 'Human T-cell leukemia virus type'
+             ]
+        allow_nltk_expand: False
+
 risk_factor:
+    risk_factor_common_name:
+        kw: ['risk factor']
+        allow_nltk_expand: False  
     gender: 
         kw: ['male', 'female' , 'gender']
         allow_nltk_expand: True
     age: 
         kw: ['age']
-        allow_nltk_expand: false
+        allow_nltk_expand: False
     disease_comorbidity: 
         kw: ['disease comorbidity', 'comorbidity']
         allow_nltk_expand: True
@@ -35,19 +57,59 @@ risk_factor:
         allow_nltk_expand: False
         
 diagnostic:
-    imaging:
-        kw: []
-        allow_nltk_expand: True
+    diagnostic_common_name: 
+        kw: ['symptom']
+        allow_nltk_expand: False
+    
+    symptom: 
+        kw: ['fever', 'dry cough', 'lose of smell', 'difficult to breath', 'hard to breath', 
+             'shortness of breath', 'headaches', 'aches and pains', 'sore throat', 'fatigue',
+             'diarrhea', 'running nose', 'sneezing', 'cough']
+        allow_nltk_expand: False
+
+    imaging_diagnosis:
+        kw: ['ct', 'ct imaging']
+        allow_nltk_expand: False
+        
+    clinical_diagnosis:
+        kw: ['respiratory tract infection', 'virus infection', 
+             'acute respiratory distress syndrome', 'acute respiratory failure',
+             'influenza virus infection', 'irritation of the respiratory tract', 
+             'porcine reproductive and respiratory syndrome', 'upper respiratory infection',
+             'gastrointestinal viral infection', 'H1N1 viral infection',
+             'H5N1 viral infection', 'gastrointestinal viral infection',
+             'reproductive and respiratory syndrome virus infection', 
+             'acquired immunodeficiency syndrome', 'nosocomial viral respiratory infections',
+             'coronavirus OC43 infection', 'H3N2 virus infection', 'long QT syndrome',
+             'liver cell necrosis', 'latent TB infection', 'Pulmonary Coronavirus Infection',
+             'Leukocyte adhesion deficiency II syndrome', 'infection of the central nervous system',
+             'infection of the pulmonary parenchyma', 
+            ]
+        allow_nltk_expand: False
+            
+    genetic_diagnosis:
+        kw: ['dsRNA', 'dsDNA', 'RNA', 'DNA']
+        allow_nltk_expand: False
     
 treatment_and_vaccine:
+    treatment_and_vaccine_common_name: 
+        kw: ['treatment', 'vaccine', 'intervention']
+        allow_nltk_expand: False
+
     treatment:
         kw: []
-        allow_nltk_expand: True
+        allow_nltk_expand: False
     
 outcome:
-    death_rate:
-        kw: []
-        allow_nltk_expand: True
+    outcome_common_name: 
+        kw: ['outcome']
+        allow_nltk_expand: False
+
+    clinical_outcome:
+        kw: ['death', 'death rate', 'recovery rate', 'mobility', 'lung damage', 
+        'lung capacity', 'length of survival', 'hospitalization','sepus', 'discharge',
+        'clinical outcome']
+        allow_nltk_expand: False
 
 
 
