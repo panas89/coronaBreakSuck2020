@@ -7,7 +7,7 @@ import numpy as np
 import re
 import json
 from tqdm import tqdm
-from .nltkPreProc import *
+from covid.data.nltkPreProc import *
 
 ###########################################################################
 
