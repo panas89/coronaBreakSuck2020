@@ -14,6 +14,9 @@ PYTHON_INTERPRETER = python3
 
 metadata_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-10/metadata.csv
 medrxiv_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-03/biorxiv_medrxiv.tar.gz
+comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/comm_use_subset.tar.gz
+non_comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/noncomm_use_subset.tar.gz
+cust_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/custom_license.tar.gz
 
 
 ifeq (,$(shell which conda))
@@ -36,9 +39,22 @@ download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
 	curl -o data/raw/metadata.csv $(metadata_DATA_URL)
 	@echo ">>> Downloading data from Semantic Scholar"
+	@echo ">>> Downloading medarxiv json files"
 	curl -o data/raw/biorxiv_medrxiv.tar.gz $(medrxiv_DATA_URL)
 	@echo ">>> Unzipping."
 	tar xvzf data/raw/biorxiv_medrxiv.tar.gz -C data/raw
+	@echo ">>> Downloading commercial data json files"
+	curl -o data/raw/comm_use_subset.tar.gz $(comm_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/comm_use_subset.tar.gz -C data/raw
+	@echo ">>> Downloading non commercial data json files"
+	curl -o data/raw/noncomm_use_subset.tar.gz $(non_comm_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/noncomm_use_subset.tar.gz -C data/raw
+	@echo ">>> Downloading custom data json files"
+	curl -o data/raw/custom_license.tar.gz $(cust_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/custom_license.tar.gz -C data/raw
 
 
 ## Make Dataset
