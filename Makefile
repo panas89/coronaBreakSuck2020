@@ -34,6 +34,10 @@ requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
+## Save current requirements
+save_requirements: 
+	$(PYTHON_INTERPRETER) -m pip freeze > requirements.txt
+
 ## Download datasets
 download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
