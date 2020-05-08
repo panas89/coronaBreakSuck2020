@@ -69,6 +69,9 @@ data: #requirements
 	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/noncomm_use_subset/pdf_json/ data/processed/ noncomm_use_subset.csv ["title","abstract"] False
 	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/custom_license/pdf_json/ data/processed/ custom_license.csv ["title","abstract"] False
 
+#joining csv files to metadata csv
+join_datasets: 
+	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/ data/raw/merged_raw_data.csv metadata.csv ["bioarxiv.csv","comm_use_subset.csv","noncomm_use_subset.csv","custom_license.csv"]
 
 ## Query Datasets
 query_data: #requirements
