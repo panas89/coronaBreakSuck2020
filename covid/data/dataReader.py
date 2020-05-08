@@ -68,7 +68,22 @@ def format_affiliation(affiliation):
     institution = affiliation.get('institution')
     if institution:
         text = [institution] + text
-    return ", ".join(text)
+    return " ; ".join(text)
+
+def format_location(authors):
+    text = []
+    for author in authors:
+        affiliation = author['affiliation']
+        if affiliation:
+            location = affiliation.get('location')
+            if location:
+                text.extend(list(affiliation['location'].values()))
+            else:
+                text.append(' ')
+        else:
+            text.append(' ')
+        
+    return " ; ".join(text)
 
 def format_authors(authors, with_affiliation=False):
     name_ls = []
@@ -84,7 +99,7 @@ def format_authors(authors, with_affiliation=False):
         else:
             name_ls.append(name)
     
-    return ", ".join(name_ls)
+    return " ; ".join(name_ls)
 
 
 def format_body(body_text):
@@ -142,6 +157,7 @@ def generate_clean_df(all_files):
             format_authors(file['metadata']['authors']),
             format_authors(file['metadata']['authors'], 
                            with_affiliation=True),
+            format_location(file['metadata']['authors']),               
             format_body(file['abstract']),
             format_body(file['body_text']),
             format_bib(file['bib_entries']),
@@ -152,7 +168,7 @@ def generate_clean_df(all_files):
         cleaned_files.append(features)
 
     col_names = ['paper_id', 'title', 'authors',
-                 'affiliations', 'abstract', 'text', 
+                 'affiliations', 'location', 'abstract', 'text', 
                  'bibliography','raw_authors','raw_bibliography']
 
     clean_df = pd.DataFrame(cleaned_files, columns=col_names)

@@ -14,6 +14,9 @@ PYTHON_INTERPRETER = python3
 
 metadata_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-10/metadata.csv
 medrxiv_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-03/biorxiv_medrxiv.tar.gz
+comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/comm_use_subset.tar.gz
+non_comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/noncomm_use_subset.tar.gz
+cust_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/custom_license.tar.gz
 
 
 ifeq (,$(shell which conda))
@@ -31,20 +34,44 @@ requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
+## Save current requirements
+save_requirements: 
+	$(PYTHON_INTERPRETER) -m pip freeze > requirements.txt
+
 ## Download datasets
 download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
 	curl -o data/raw/metadata.csv $(metadata_DATA_URL)
 	@echo ">>> Downloading data from Semantic Scholar"
+	@echo ">>> Downloading medarxiv json files"
 	curl -o data/raw/biorxiv_medrxiv.tar.gz $(medrxiv_DATA_URL)
 	@echo ">>> Unzipping."
 	tar xvzf data/raw/biorxiv_medrxiv.tar.gz -C data/raw
+	@echo ">>> Downloading commercial data json files"
+	curl -o data/raw/comm_use_subset.tar.gz $(comm_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/comm_use_subset.tar.gz -C data/raw
+	@echo ">>> Downloading non commercial data json files"
+	curl -o data/raw/noncomm_use_subset.tar.gz $(non_comm_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/noncomm_use_subset.tar.gz -C data/raw
+	@echo ">>> Downloading custom data json files"
+	curl -o data/raw/custom_license.tar.gz $(cust_DATA_URL)
+	@echo ">>> Unzipping."
+	tar xvzf data/raw/custom_license.tar.gz -C data/raw
 
 
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
 data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"]
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/comm_use_subset/pdf_json/ data/processed/ comm_use_subset.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/noncomm_use_subset/pdf_json/ data/processed/ noncomm_use_subset.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/custom_license/pdf_json/ data/processed/ custom_license.csv ["title","abstract"] False
+
+#joining csv files to metadata csv
+join_datasets: 
+	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/ data/raw/merged_raw_data.csv metadata.csv ["bioarxiv.csv","comm_use_subset.csv","noncomm_use_subset.csv","custom_license.csv"]
 
 ## Query Datasets
 query_data: #requirements
