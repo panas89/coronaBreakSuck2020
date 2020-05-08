@@ -93,8 +93,8 @@ def lemmatize_tokens(tokens, pos_tag='v'):
 
 
 def preprocess_text(text, bad_phrases=None, bad_tokens=None, min_char=3, 
-                    pos_tags=['v'], remove_digits=True, replace_numbers=False,
-                    replace_contractions=False):
+                    pos_tags=['v'], remove_dig=True, replace_num=False,
+                    replace_contr=False):
     """
     Input: text (string)
     Output: list of tokens (strings)
@@ -103,9 +103,9 @@ def preprocess_text(text, bad_phrases=None, bad_tokens=None, min_char=3,
         - bad_tokens: list of strings - if not None, then remove all listed strings from tokens
         - min_char: integer - remove all token with characters strictly less than min_char
         - pos_tags: list of pos tags - lemmatize tokens with listed pos tags
-        - remove_digits: Boolean - if True, remove all digits from tokens
-        - replace_numbers: Boolean - if remove_digits=False and replace_numbers=True, convert digits to words
-        - replace_contractions: Boolean - if True, replace e.g. you're -> you are
+        - remove_dig: Boolean - if True, remove all digits from tokens
+        - replace_num: Boolean - if remove_digits=False and replace_numbers=True, convert digits to words
+        - replace_contr: Boolean - if True, replace e.g. you're -> you are
     """
 
     # A. Text Methods
@@ -122,7 +122,7 @@ def preprocess_text(text, bad_phrases=None, bad_tokens=None, min_char=3,
         text = remove_bad_phrases(text, bad_phrases)
 
     # 4. Replace contractions s.t. you're -> you are
-    if replace_contractions:
+    if replace_contr:
         text = replace_contractions(text)
 
     # 5. Tokenize text
@@ -147,9 +147,9 @@ def preprocess_text(text, bad_phrases=None, bad_tokens=None, min_char=3,
     tokens = remove_low_char(tokens, min_char)
 
     # 6. Remove or Convert digits to words
-    if remove_digits:
+    if remove_dig:
         tokens = remove_digits(tokens)
-    elif replace_numbers:
+    elif replace_num:
         tokens = replace_numbers(tokens)
 
     # 7. Lemmatize tokens
