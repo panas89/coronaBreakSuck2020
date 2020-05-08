@@ -68,7 +68,7 @@ def format_affiliation(affiliation):
     institution = affiliation.get('institution')
     if institution:
         text = [institution] + text
-    return ", ".join(text)
+    return " ; ".join(text)
 
 def format_location(authors):
     text = []
@@ -83,7 +83,7 @@ def format_location(authors):
         else:
             text.append(' ')
         
-    return ", ".join(text)
+    return " ; ".join(text)
 
 def format_authors(authors, with_affiliation=False):
     name_ls = []
@@ -99,7 +99,7 @@ def format_authors(authors, with_affiliation=False):
         else:
             name_ls.append(name)
     
-    return ", ".join(name_ls)
+    return " ; ".join(name_ls)
 
 
 def format_body(body_text):
