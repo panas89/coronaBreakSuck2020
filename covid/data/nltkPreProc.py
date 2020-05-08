@@ -1,184 +1,163 @@
-import re, string, unicodedata
-import numpy as np
-import nltk
+import re, unicodedata
 import contractions
 import inflect
 from bs4 import BeautifulSoup
-from nltk import word_tokenize, sent_tokenize
+from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import LancasterStemmer, WordNetLemmatizer
 
-"""This code is from a KDnuggets tutorial
-https://www.kdnuggets.com/2018/03/text-data-preprocessing-walkthrough-python.html
-
-Author: Matthew Mayo
-
-Just did minor modifications.
-"""
-
-sample = """<h1>Title Goes Here</h1>
-<b>Bolded Text</b>
-<i>Italicized Text</i>
-<img src="this should all be gone"/>
-<a href="this will be gone, too">But this will still be here!</a>
-I run. He ran. She is running. Will they stop running?
-I talked. She was talking. They talked to them about running. Who ran to the talking runner?
-[Some text we don't want to keep is in here]
-¡Sebastián, Nicolás, Alejandro and Jéronimo are going to the store tomorrow morning!
-something... is! wrong() with.,; this :: sentence.
-I can't do this anymore. I didn't know them. Why couldn't you have dinner at the restaurant?
-My favorite movie franchises, in order: Indiana Jones; Marvel Cinematic Universe; Star Wars; Back to the Future; Harry Potter.
-Don't do it.... Just don't. Billy! I know what you're doing. This is a great little house you've got here.
-[This is some other unwanted text]
-John: "Well, well, well."
-James: "There, there. There, there."
-&nbsp;&nbsp;
-There are a lot of reasons not to do this. There are 101 reasons not to do it. 1000000 reasons, actually.
-I have to go get 2 tutus from 2 different stores, too.
-22    45   1067   445
-{{Here is some stuff inside of double curly braces.}}
-{Here is more stuff in single curly braces.}
-[DELETE]
-</body>
-</html>"""
+#------------------- Text Methods ------------------
 
 def strip_html(text):
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
 def remove_between_square_brackets(text):
-    return re.sub('\[[^]]*\]', '', text)
+    return re.sub(r'\[.*?\]', '', text)
 
-def denoise_text(text):
-    text = strip_html(text)
-    text = remove_between_square_brackets(text)
+def remove_between_parenteses(text):
+    return re.sub(r'\(.*?\)', '', text)
+
+def remove_bad_phrases(text, bad_phrases):
+    for phrase in bad_phrases:
+        text = re.sub(phrase, '', text, flags=re.IGNORECASE)
     return text
 
 def replace_contractions(text):
     """Replace contractions in string of text"""
     return contractions.fix(text)
 
-def getTokens(text):
-    return nltk.word_tokenize(text)
+def tokenize_text(text):
+    return word_tokenize(text)
 
-def remove_non_ascii(words):
+
+#------------------- Token Methods ---------------------
+
+def remove_non_ascii(tokens):
     """Remove non-ASCII characters from list of tokenized words"""
-    new_words = []
-    for word in words:
-        new_word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
-        new_words.append(new_word)
-    return new_words
+    return [unicodedata.normalize('NFKD', token).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+            for token in tokens]
 
-def to_lowercase(words):
+def to_lowercase(tokens):
     """Convert all characters to lowercase from list of tokenized words"""
-    new_words = []
-    for word in words:
-        new_word = word.lower()
-        new_words.append(new_word)
-    return new_words
+    return [token.lower() for token in tokens]
 
-def remove_punctuation(words):
+def remove_punctuation(tokens):
     """Remove punctuation from list of tokenized words"""
-    new_words = []
-    for word in words:
-        new_word = re.sub(r'[^\w\s]', '', word)
-        if new_word != '':
-            new_words.append(new_word)
-    return new_words
+    new_tokens = []
+    for token in tokens:
+        new_token = re.sub(r'[^\w\s]', '', token)
+        if new_token != '':
+            new_tokens.append(new_token)
+    return new_tokens
 
-def replace_numbers(words):
+def remove_low_char(tokens, min_char):
+    return [token for token in tokens if len(token) >= min_char]
+
+def remove_digits(tokens):
+    return [token for token in tokens if token.isalpha()]
+
+def replace_numbers(tokens):
     """Replace all interger occurrences in list of tokenized words with textual representation"""
     p = inflect.engine()
-    new_words = []
-    for word in words:
-        if word.isdigit():
+    new_tokens = []
+    for token in tokens:
+        if token.isdigit():
             try:
-                new_word = p.number_to_words(word)
-                new_words.append(new_word)
+                new_token = p.number_to_words(token)
+                new_tokens.append(new_token)
             except Exception as e:
                 print(e)
         else:
-            new_words.append(word)
-    return new_words
-
-def remove_stopwords(words):
+            new_token.append(token)
+    return new_token
+    
+def remove_stopwords(tokens, bad_tokens=None):
     """Remove stop words from list of tokenized words"""
-    new_words = []
-    for word in words:
-        if word not in stopwords.words('english'):
-            new_words.append(word)
-    return new_words
+    remove_tokens = stopwords.words('english')
+    if bad_tokens:
+        remove_tokens.extend(bad_tokens)
+    return [token for token in tokens if token not in remove_tokens]
 
-def normalize(words):
-    words = remove_non_ascii(words)
-    words = to_lowercase(words)
-    words = remove_punctuation(words)
-    words = replace_numbers(words)
-    words = remove_stopwords(words)
-    return words
-
-# #create normalize titles function
-# def normalizePaperTitles(words):
-#     words = remove_non_ascii(words)
-#     words = to_lowercase(words)
-#     #words = remove_punctuation(words)
-#     #words = replace_numbers(words)
-#     #words = remove_stopwords(words)
-#     return words
-
-def stem_words(words):
-    """Stem words in list of tokenized words"""
+def stem_tokens(tokens):
+    """Stem tokens in list of tokenized words"""
     stemmer = LancasterStemmer()
-    stems = []
-    for word in words:
-        stem = stemmer.stem(word)
-        stems.append(stem)
-    return stems
+    return [stemmer.stem(token) for token in tokens]
 
-def lemmatize_verbs(words):
-    """Lemmatize verbs in list of tokenized words"""
+def lemmatize_tokens(tokens, pos_tag='v'):
+    """Lemmatize tokens in list of tokenized words"""
     lemmatizer = WordNetLemmatizer()
-    lemmas = []
-    for word in words:
-        lemma = lemmatizer.lemmatize(word, pos='v')
-        lemmas.append(lemma)
-    return lemmas
+    return [lemmatizer.lemmatize(token, pos=pos_tag) for token in tokens]
 
-def stem_and_lemmatize(words):
-    stems = stem_words(words)
-    lemmas = lemmatize_verbs(words)
-    return stems, lemmas
+#-------------------- Text PreProcessor ---------------------------
 
-def preProcessPipeline(text,lemmatize=True,join_words=False):
-    if isinstance(text,str):
+
+def preprocess_text(text, bad_phrases=None, bad_tokens=None, min_char=3, 
+                    pos_tags=['v'], remove_digits=True, replace_numbers=False,
+                    replace_contractions=False):
+    """
+    Input: text (string)
+    Output: list of tokens (strings)
+    Parameters:
+        - bad_phrases: list of regex - if not None, then remove all listed phrases from text
+        - bad_tokens: list of strings - if not None, then remove all listed strings from tokens
+        - min_char: integer - remove all token with characters strictly less than min_char
+        - pos_tags: list of pos tags - lemmatize tokens with listed pos tags
+        - remove_digits: Boolean - if True, remove all digits from tokens
+        - replace_numbers: Boolean - if remove_digits=False and replace_numbers=True, convert digits to words
+        - replace_contractions: Boolean - if True, replace e.g. you're -> you are
+    """
+
+    # A. Text Methods
+    #--------------------
+    # 1. Remove urls
+    text = BeautifulSoup(text, "html.parser").get_text()
+
+    # 2. Remove terms in brackets
+    text = remove_between_square_brackets(text)
+    text = remove_between_parenteses(text)
+
+    # 3. Remove common phrases
+    if bad_phrases:
+        text = remove_bad_phrases(text, bad_phrases)
+
+    # 4. Replace contractions s.t. you're -> you are
+    if replace_contractions:
         text = replace_contractions(text)
-        text = denoise_text(text)
-        words = getTokens(text)
 
-        words_norm =  normalize(words)
-        stems, lemmas = stem_and_lemmatize(words_norm)
-        
-        if join_words:
-            if lemmatize:
-                return lemmas
-            else:
-                return stems
-        else:
-            if lemmatize:
-                return ' '.join(lemmas)
-            else:
-                return ' '.join(stems)
-    else:
-        return np.nan
+    # 5. Tokenize text
+    tokens= tokenize_text(text)
+
+    # B. Token Methods
+    #--------------------
+
+    # 1. Covert tokens to lowercase 
+    tokens = to_lowercase(tokens)
+
+    # 2. Remove non-ASCII strings
+    tokens = remove_non_ascii(tokens)
+
+    # 3. Remove Stopwords & bad tokens
+    tokens = remove_stopwords(tokens, bad_tokens=bad_tokens)
+
+    # 4. Remove punctuation
+    tokens = remove_punctuation(tokens)
+
+    # 5. Filter tokens of length < min_char
+    tokens = remove_low_char(tokens, min_char)
+
+    # 6. Remove or Convert digits to words
+    if remove_digits:
+        tokens = remove_digits(tokens)
+    elif replace_numbers:
+        tokens = replace_numbers(tokens)
+
+    # 7. Lemmatize tokens
+    for tag in pos_tags:
+        tokens = lemmatize_tokens(tokens, pos_tag=tag)
+
+    # 8. Repeat filter stop/bad tokens
+    tokens = remove_stopwords(tokens, bad_tokens=bad_tokens)
 
 
-
-if __name__ == "__main__":
-    sample = replace_contractions(sample)
-    sample = denoise_text(sample) #only used for html tags
-    words = getTokens(sample)
-    words = normalize(words)
-    stems, lemmas = stem_and_lemmatize(words)
-    print(words)
-    print('Stemmed:\n', stems)
-    print('\nLemmatized:\n', lemmas)
+    return tokens
