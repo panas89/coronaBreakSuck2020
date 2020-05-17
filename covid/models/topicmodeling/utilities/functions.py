@@ -53,6 +53,8 @@ def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens):
     
     df['clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
     df['clean_text'] = df['text'].apply(lambda x: text_cleaner(x))
+    df['clean_abstract'] = df['abstract'].apply(lambda x: text_cleaner(x))
+    df['clean_title'] = df['title'].apply(lambda x: text_cleaner(x))
 
     print('Fraction of selected papers: {}/{}'.format(len(df), NUM_COVID_PAPERS))
     
