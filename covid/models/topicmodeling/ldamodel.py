@@ -1,3 +1,8 @@
+# Misc
+import os
+import time
+
+
 # Arrays & Dataframes
 import numpy as np
 import pandas as pd
@@ -10,20 +15,23 @@ import gensim.corpora as corpora
 from gensim.models import CoherenceModel, Phrases
 from gensim.models.ldamulticore import LdaMulticore
 from gensim.models.ldamodel import LdaModel
+from gensim.models.wrappers import LdaMallet
+from gensim.models.wrappers.ldamallet import malletmodel2ldamodel
 
 # Sklearn
 from sklearn.model_selection import ParameterGrid
+from sklearn.metrics import f1_score
 
 # **Note**: LdaModel trasforms docs and tokens to the (num_topics)-dimensional latent space of topics
 # LdaModel[corpus][i][0] = list((topic_no, probability))
 # LdaModel[corpus][i][1] = list((token_vocab_key, [topic_no])
 # LdaModel[corpus][i][2] = list((token_vocab_key, [(topic_no, probability)])
 
-
+# MALLET_PATH = '../mallet-2.0.8/bin/mallet'
 
 class LDAModel:
 
-    def __init__(self, text_data):
+    def __init__(self, text_data, meta_data=None):
         """
         Class Object to train and evaluate LDA gensim models.
         Input:
@@ -34,7 +42,8 @@ class LDAModel:
         self.id2word = corpora.Dictionary(text_data)
 
         # Convert each doc to bag-of-words
-        self.corpus = self.create_corpus(text_data)
+        self.corpus = self.create_corpus(text_data)  
+        self.meta_corpus = self.create_corpus(meta_data) if meta_data else None 
 
         # Model-related Attributes
         self.lda_model = None
@@ -65,19 +74,26 @@ class LDAModel:
             and returns self
         """
 
+        self.lda_class = lda_class
         self.params = params
+
+        if params.get('per_word_topics'):
+            raise ValueError('Omit using parameter per_word_topics because it creates buggy models.')
 
         if lda_class == 'single':
             self.lda_model = LdaModel(corpus=self.corpus, id2word=self.id2word, **params)
         elif lda_class == 'multi':
             self.lda_model = LdaMulticore(corpus=self.corpus, id2word=self.id2word, **params)
-        # elif lda_class == 'mallet':
-        #     self.model = LdaMulticore(corpus=self.corpus, id2word=self.id2word, **params)
+        elif lda_class == 'mallet':
+            os.environ.update({'MALLET_HOME':'../covid/models/topicmodeling/mallet-2.0.8/'}) 
+            mallet_path = '../covid/models/topicmodeling/mallet-2.0.8/bin/mallet'
+            mallet_model = LdaMallet(mallet_path, corpus=self.corpus, id2word=self.id2word, **params)
+            self.lda_model = malletmodel2ldamodel(mallet_model)
 
         return self
 
 
-    def grid_search(self, text_data, param_grid, lda_class='single'):
+    def grid_search(self, text_data, param_grid, lda_class='single', scorers=['coherence_score']):
         """
         Input:
             - text_data: list of docs, i.e. list of lists of tokens
@@ -92,6 +108,7 @@ class LDAModel:
                 - Outer dict's keys: 'model_i' where 0<= i < number of grids
                 - Inner dict's keys: {'coherence_score', 'params', 'lda_model'}
         """
+        start_time = time.time()
 
         # Instantiate a sklearn ParameterGrid
         parameter_grid = ParameterGrid(param_grid)
@@ -104,26 +121,34 @@ class LDAModel:
             
             # Train model
             self.build_model(params, lda_class=lda_class)
-            score = self.compute_coherence_score(text_data)
 
             # Store params, model, score in dict
             key = f'model_{i}'
             models[key] = {}
-            models[key]['coherence_score'] = score
             models[key]['params'] = params
             models[key]['lda_model'] = self.lda_model
-            
+
+            for s in scorers:
+                if s == 'coherence_score':
+                    models[key][s] = self.compute_coherence_score(text_data)
+                elif s == 'f1_score':
+                    models[key][s] = self.compute_f1_score(average='macro')
             
             # Find best model's key
+            score = models[key][scorers[0]]  # use first scorer in scorers to find the best model
             if best_score < score:
                 best_score = score
                 best_model_key = key
 
         # Update class attributes to best model's attributes
-        self.coherence_score = models[best_model_key]['coherence_score']
         self.params = models[best_model_key]['params']
         self.lda_model = models[best_model_key]['lda_model']
+        for s in scorers:
+            self.coherence_score = models[best_model_key].get('coherence_score',np.nan)
+            self.f1_score = models[best_model_key].get('f1_score',np.nan)
         
+        print("Training lasted: {} sec".format(round(time.time() - start_time,3)))
+
         return models
 
     def compute_coherence_score(self, text_data, verbose=False):
@@ -147,6 +172,37 @@ class LDAModel:
 
         return self.coherence_score
 
+
+    def compute_f1_score(self, average='macro', verbose=False):
+
+        if self.meta_corpus is None:
+            raise ValueError('self.meta_corpus is None')
+
+        if len(self.meta_corpus)!= len(self.corpus):
+            raise ValueError('meta_corpus and corpus must have the same lengths')
+        
+        meta_preds = self.predict_topics(self.meta_corpus)
+        text_preds = self.predict_topics(self.corpus)
+
+        self.f1_score = f1_score(text_preds, meta_preds, average=average)
+
+        if verbose:
+            print('\nf1-score: ', self.f1_score)
+
+        return self.f1_score
+
+
+
+    def predict_topics(self, corpus=None):
+        corpus = corpus if corpus is not None else self.corpus
+
+        preds = []
+        for doc in self.lda_model[corpus]:
+            dominant_topic,_ = max(doc, key=lambda x: x[1])
+            preds.append(dominant_topic)
+
+        return preds
+            
 
     #----------------------- Post-Training Methods ------------------------
 
@@ -195,7 +251,7 @@ class LDAModel:
         # For each doc in corpus find the dominant topic, and the corresponding probability
         to_concat = []    
         for doc in self.lda_model[corpus]:
-            dominant_topic, topic_prob = max(doc[0], key=lambda x: x[1])
+            dominant_topic, topic_prob = max(doc, key=lambda x: x[1])
             topic_kws = ", ".join(self.get_topic_keywords(dominant_topic))
             temp_df = pd.DataFrame(data=[dominant_topic, round(topic_prob,4), topic_kws]).T
             to_concat.append(temp_df)
@@ -221,9 +277,10 @@ class LDAModel:
         
         # Loop through corpus and update dict whenever a doc has the max topic_prob
         for ID, doc in enumerate(self.lda_model[self.corpus]):
-            dominant_topic, topic_prob = max(doc[0], key=lambda x: x[1])
+            dominant_topic, topic_prob = max(doc, key=lambda x: x[1])
             if topic_prob > topic_to_id_prob[dominant_topic][1]:
                 topic_to_id_prob[dominant_topic] = (ID, topic_prob)
 
         return dict((topic_no, ID) for topic_no,(ID, prob) in topic_to_id_prob.items())             
 
+    
