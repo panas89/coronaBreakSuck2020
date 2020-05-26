@@ -12,8 +12,7 @@ import pandas as pd
 @click.argument('filename', type=click.Path())
 @click.argument('dataset_names', type=click.Path())
 def main(input_filepath, output_filepath, filename, dataset_names):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+    """ Merges all datasets into a clean csv file
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
