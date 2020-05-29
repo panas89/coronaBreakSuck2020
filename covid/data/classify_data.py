@@ -1,29 +1,60 @@
+# -*- coding: utf-8 -*-
+import click
+import logging
+from pathlib import Path
+from dotenv import find_dotenv, load_dotenv
 import numpy as np
 import pandas as pd
 from covid.models.paperclassifier.paperclassifier import PaperClassifier
 
-# Load the data
-DATA_DIR = '../data'
-FILE_PATH = '/raw/merged_raw_data.csv'
-USE_COLS = ['sha', 'title', 'abstract_x', 'text', 'publish_time']
-df = pd.read_csv(DATA_DIR + FILE_PATH, usecols=USE_COLS)\
-       .rename({'abstract_x': 'abstract'}, axis=1)
-NUM_PAPERS = len(df) 
 
-# Load the paperclassifier
-pc = PaperClassifier(km_path='../models/paperclassifier/interest.yaml')
+@click.command()
+@click.argument('input_filepath', type=click.Path(exists=True))
+@click.argument('output_filepath', type=click.Path())
+@click.argument('yaml_filepath', type=click.Path())
+def main(input_filepath, output_filepath,yaml_filepath):
+    """ Runs data processing scripts to turn raw merged data from (../raw) into
+        cleaned covid papers ready to be analyzed (saved in ../processed).
+    """
+    logger = logging.getLogger(__name__)
+    logger.info('reading data')
+    print(input_filepath)
 
-# Preprocess the dataframe text
-df_p = pc.preprocess(df)
+    USE_COLS = ['sha', 'title', 'abstract_x', 'text', 'publish_time']
+    df = pd.read_csv(input_filepath, usecols=USE_COLS)\
+        .rename({'abstract_x': 'abstract'}, axis=1)
+    NUM_PAPERS = len(df) 
 
-# Classify papers: add tags
-df_p = pc.classify_all(df_p)
+    logger.info('Classifying ...')
+    # Load the paperclassifier
+    pc = PaperClassifier(km_path=yaml_filepath)
 
-# Select covid data
-df_covid = df_p.loc[df_p['covid_related']==1].drop(['covid_related'], axis=1)
-NUM_COVID_PAPERS = len(df_covid) 
+    # Preprocess the dataframe text
+    df_p = pc.preprocess(df)
 
-print("Fraction of covid papers: {}/{}".format(NUM_COVID_PAPERS, NUM_PAPERS))
+    # Classify papers: add tags
+    df_p = pc.classify_all(df_p)
 
-# Save data
-df_covid.to_csv(DATA_DIR + '/paperclassifier/classified_merged_covid.csv', index=False)
+    # Select covid data
+    df_covid = df_p.loc[df_p['covid_related']==1].drop(['covid_related'], axis=1)
+    NUM_COVID_PAPERS = len(df_covid) 
+
+    print("Fraction of covid papers: {}/{}".format(NUM_COVID_PAPERS, NUM_PAPERS))
+
+    # Save data
+    df_covid.to_csv(output_filepath, index=False)
+        
+
+
+if __name__ == '__main__':
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=log_fmt)
+
+    # not used in this stub but often useful for finding various files
+    project_dir = Path(__file__).resolve().parents[2]
+
+    # find .env automagically by walking up directories until it's found, then
+    # load up the .env entries as environment variables
+    load_dotenv(find_dotenv())
+
+    main()

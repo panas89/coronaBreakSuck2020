@@ -73,9 +73,9 @@ data: #requirements
 join_datasets: 
 	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/ data/raw/merged_raw_data.csv metadata.csv ["bioarxiv.csv","comm_use_subset.csv","noncomm_use_subset.csv","custom_license.csv"]
 
-## Query Datasets
-query_data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/query_data.py data/raw/ data/filtered/ metadata.csv ["title","abstract"]
+## Classify Datasets
+classify_data: #requirements
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
 
 ## Delete all compiled Python files
 clean:
