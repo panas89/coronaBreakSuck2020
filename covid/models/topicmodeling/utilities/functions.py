@@ -14,10 +14,13 @@ my_pal = sns.color_palette(n_colors=20)
 # Utils
 from covid.data.nltkPreProc import preprocess_text
 
+# Sklearn
+from sklearn.metrics import confusion_matrix
 
 
+#------------------------ PreProcessing Methods -------------------------
 
-def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens):
+def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens, drop_nan_text=False, from_date='2020-01-01'):
     
     # Load relevant data
     paper_info_cols = ['sha', 'title', 'abstract', 'text', 'publish_time']
@@ -26,22 +29,26 @@ def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens):
                      parse_dates=['publish_time'])
     NUM_COVID_PAPERS = len(df)
     
+    # Select only papers published from/after 'from_date'
+    df = df[df.publish_time >= from_date]
+
     # Query class cols and then drop them
     for c in class_cols:
         df = df.loc[df[c]==1]
     df = df.drop(class_cols, axis=1)
     
     # Treat NaNs
-    df[['title', 'abstract']] = df[['title', 'abstract']].fillna('')
-    df.dropna(subset=['text'], axis=0, inplace=True)
+    if drop_nan_text:
+        df.dropna(subset=['text'], axis=0, inplace=True)
+    df[['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
     
     # Create meta col
     df['abstract'] = df['abstract'].apply(lambda x: x[len('abstract'):] 
                                           if x[:len('abstract')].lower() == 'abstract' 
-                                          else x) # Remove string 'abstract' from abstract col
+                                          else x) # remove string 'abstract' from abstract col
     df['meta'] = df['title'] + ' ' + df['abstract']
     
-    # Clean meta/text cols
+    # Clean cols
     text_cleaner = partial(preprocess_text,
                            bad_phrases=bad_phrases, 
                            bad_tokens=bad_tokens, 
@@ -50,15 +57,18 @@ def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens):
                            remove_dig=True, 
                            replace_num=False,
                            replace_contr=False)
-    
-    df['clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
+
+    df['clean_title'] = df['title'].apply(lambda x: text_cleaner(x))
+    df['clean_abstract'] = df['abstract'].apply(lambda x: text_cleaner(x))
     df['clean_text'] = df['text'].apply(lambda x: text_cleaner(x))
+    df['clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
 
     print('Fraction of selected papers: {}/{}'.format(len(df), NUM_COVID_PAPERS))
     
     return df.reset_index(drop=True)
 
 
+#------------------------ DataFrame Methods -------------------------
 
 
 def gs_models_to_df(gs_models, scorers):
@@ -77,6 +87,21 @@ def gs_models_to_df(gs_models, scorers):
 
     return df_gs
 
+def gs_models_to_df_multi(gs_models_dict, scorers):
+    to_concat = []
+    for name, gs_models in gs_models_dict.items():
+        temp_df = gs_models_to_df(gs_models, scorers).reset_index()
+        temp_df['name'] = name
+        to_concat.append(temp_df)
+
+    df = pd.concat(to_concat,axis=0).set_index(['name', 'model'])
+    return df
+
+
+
+#------------------------ Plotting Methods -------------------------
+
+
 def print_evaluation_graph(gs_models, scorers):
     data = defaultdict(list)
     for model, d in gs_models.items():
@@ -93,15 +118,16 @@ def print_evaluation_graph(gs_models, scorers):
         axs[i].plot(data['model'], data[s], '-o', color=my_pal[i])
         axs[i].set_ylabel(f'{s}', size=14)
     
-        
     return
 
 
 def print_evaluation_graph_multi(gs_models_dict, scorers):
     n_rows = len(scorers)
-    fig, axs = plt.subplots(n_rows, 1, sharex=True, figsize=(10,10))
+    fig, axs = plt.subplots(n_rows, 1, sharex=False, figsize=(10,10))
     fig.suptitle('Model Evaluation', fontsize=16)
-    for i,(lda_class,gs_models) in enumerate(gs_models_dict.items()):
+    # loop over name of lda type and gs_models for that lda
+    for i,(lda_name,gs_models) in enumerate(gs_models_dict.items()):
+        # convert data in gs_models into appropriate format for plotting
         data = defaultdict(list)
         for model, d in gs_models.items():
             data['model'].append(model)
@@ -109,12 +135,18 @@ def print_evaluation_graph_multi(gs_models_dict, scorers):
                 data[param_name].append(value)
             for s in scorers:
                 data[s].append(d[s])
-
-        for j,s in enumerate(scorers):
-            axs[j].plot(data['model'], data[s], '-o', color=my_pal[i], label=lda_class)
-            axs[j].set_ylabel(f'{s}', size=14)
-            
-    plt.legend(loc=(1,1.9), prop={'size': 15})
+                
+        # if n_rows=1 then axs is NOT an array
+        if n_rows == 1:
+            s = scorers[0]
+            axs.plot(data['model'], data[s], '-o', color=my_pal[i], label=lda_name)
+            axs.set_ylabel(f'{s}', size=14)
+        else:
+            for j,s in enumerate(scorers):
+                axs[j].plot(data['model'], data[s], '-o', color=my_pal[i], label=lda_name)
+                axs[j].set_ylabel(f'{s}', size=14)
+       
+    plt.legend(loc='right', prop={'size': 15})
     plt.xticks(rotation=90)
         
     return
@@ -139,3 +171,37 @@ def print_topic_freq(df_top_topic_per_doc):
     plt.xticks(rotation=0)
     
     return
+
+
+def plot_confusion_matrix(lda):
+    cf_matrix = confusion_matrix(lda.predict_topics(lda.corpus), lda.predict_topics(lda.test_corpus))
+    plt.figure(figsize=(10,7))
+    sns.heatmap(cf_matrix/np.sum(cf_matrix), annot=True, 
+                fmt='.2%', cmap='Blues')
+
+    return 
+
+
+
+
+# def print_evaluation_graph_multi(gs_models_dict, scorers):
+#     n_rows = len(scorers)
+#     fig, axs = plt.subplots(n_rows, 1, sharex=True, figsize=(10,10))
+#     fig.suptitle('Model Evaluation', fontsize=16)
+#     for i,(lda_class,gs_models) in enumerate(gs_models_dict.items()):
+#         data = defaultdict(list)
+#         for model, d in gs_models.items():
+#             data['model'].append(model)
+#             for param_name, value in d['params'].items():
+#                 data[param_name].append(value)
+#             for s in scorers:
+#                 data[s].append(d[s])
+
+#         for j,s in enumerate(scorers):
+#             axs[j].plot(data['model'], data[s], '-o', color=my_pal[i], label=lda_class)
+#             axs[j].set_ylabel(f'{s}', size=14)
+            
+#     plt.legend(loc=(1,1.9), prop={'size': 15})
+#     plt.xticks(rotation=90)
+        
+#     return
