@@ -25,10 +25,6 @@ def main(input_filepath, output_filepath,yaml_filepath):
         .rename({'abstract_x': 'abstract'}, axis=1)
     NUM_PAPERS = len(df) 
 
-    logger.info('replacing commas ...')
-    for col in ['abstract','text']:
-        df[col] = [i.replace(',','') if pd.notnull(i) else np.nan for i in df[col]]
-
     logger.info('Classifying ...')
     # Load the paperclassifier
     pc = PaperClassifier(km_path=yaml_filepath)
