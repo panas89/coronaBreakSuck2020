@@ -8,5 +8,5 @@ COMMON_PHRASES_REGEX = [r'(International .+ perpetuity\.)',
                        ]
 
 COMMON_WORDS = ['wuhan', 'covid-19', 'sars-cov-2', '2019-ncov', 'corona', 'coronavirus', 'covid', 'covid19', 
-                'author/funder', 'authorfunder', 'use', 'case', 'china', 'model', 'number', 'also', 'study',
-                'viral', 'virus', 'data']
+                'covs', 'cov','author/funder', 'authorfunder', 'use', 'case', 'china', 'model', 'number', 
+                'also', 'study','viral', 'virus', 'data']
