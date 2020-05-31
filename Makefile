@@ -73,6 +73,13 @@ data: #requirements
 join_datasets: 
 	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/ data/raw/merged_raw_data.csv metadata.csv ["bioarxiv.csv","comm_use_subset.csv","noncomm_use_subset.csv","custom_license.csv"]
 
+## Preprocess Datasets
+preproc_dataset: #location and affilliations classification
+	###### get location for all papers around 2hrs run time
+	# $(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/raw/merged_raw_data.csv data/processed/merged_raw_data.csv 11
+	###### get location for covid papers only
+	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_merged_covid.csv data/processed/classified_merged_covid.csv 11
+
 ## Classify Datasets
 classify_data: #requirements
 	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
