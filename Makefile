@@ -18,6 +18,12 @@ comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/l
 non_comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/noncomm_use_subset.tar.gz
 cust_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/custom_license.tar.gz
 
+forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
+forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
+forecast_US_death = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv
+forecast_global_death = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv
+forecast_global_recovered = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv
+
 
 ifeq (,$(shell which conda))
 HAS_CONDA=False
@@ -59,6 +65,19 @@ download_data:
 	curl -o data/raw/custom_license.tar.gz $(cust_DATA_URL)
 	@echo ">>> Unzipping."
 	tar xvzf data/raw/custom_license.tar.gz -C data/raw
+
+download_forecasting_data:
+	@echo ">>> Downloading Forecasting data from John Hopkins"
+	@echo ">>> Downloading data confirmed cases USA"
+	curl -o data/raw/conf_USA.csv $(forecast_US_conf)
+	@echo ">>> Downloading data death data USA"
+	curl -o data/raw/death_USA.csv $(forecast_US_death)
+	@echo ">>> Downloading data confirmed cases Global"
+	curl -o data/raw/conf_global.csv $(forecast_global_conf)
+	@echo ">>> Downloading data death data global"
+	curl -o data/raw/death_global.csv $(forecast_global_death)
+	@echo ">>> Downloading data recovered cases global"
+	curl -o data/raw/recovered_global.csv $(forecast_global_recovered)
 
 
 ## Make Dataset
