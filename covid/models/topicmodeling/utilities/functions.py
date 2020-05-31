@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 my_pal = sns.color_palette(n_colors=20)
 
-# Utils
+# Utilities
 from covid.data.nltkPreProc import preprocess_text
 
 # Sklearn
