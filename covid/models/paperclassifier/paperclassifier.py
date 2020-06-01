@@ -1,5 +1,5 @@
 from nltk.corpus import wordnet 
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 from collections import defaultdict, OrderedDict
 
 import yaml
