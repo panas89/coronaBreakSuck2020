@@ -7,7 +7,6 @@ import geograpy3
 import time
 
 
-
 def extract_location(text, is_robust=True):
     """
     Given a string, extraction the location information (i.e., countries) from the string.
@@ -57,17 +56,3 @@ def extract_location(text, is_robust=True):
     else:
         cs = gt_countries
     return ",".join(cs)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
