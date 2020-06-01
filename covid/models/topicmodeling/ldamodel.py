@@ -1,7 +1,7 @@
 # Misc
 import os
 import time
-
+from pathlib import Path
 
 # Arrays & Dataframes
 import numpy as np
@@ -12,7 +12,7 @@ tqdm.pandas()
 # Gensim
 import gensim
 import gensim.corpora as corpora
-from gensim.models import CoherenceModel, Phrases
+from gensim.models import CoherenceModel, Phrases, TfidfModel
 from gensim.models.ldamulticore import LdaMulticore
 from gensim.models.ldamodel import LdaModel
 from gensim.models.wrappers import LdaMallet
@@ -27,11 +27,12 @@ from sklearn.metrics import f1_score
 # LdaModel[corpus][i][1] = list((token_vocab_key, [topic_no])
 # LdaModel[corpus][i][2] = list((token_vocab_key, [(topic_no, probability)])
 
-# MALLET_PATH = '../mallet-2.0.8/bin/mallet'
+CUR_DIR = str(Path(__file__).parents[0])
+MALLET_DIR= CUR_DIR + '/mallet-2.0.8/'
 
 class LDAModel:
 
-    def __init__(self, text_data, meta_data=None):
+    def __init__(self, text_data, test_data=None):
         """
         Class Object to train and evaluate LDA gensim models.
         Input:
@@ -43,7 +44,7 @@ class LDAModel:
 
         # Convert each doc to bag-of-words
         self.corpus = self.create_corpus(text_data)  
-        self.meta_corpus = self.create_corpus(meta_data) if meta_data else None 
+        self.test_corpus = self.create_corpus(test_data) if test_data else None 
 
         # Model-related Attributes
         self.lda_model = None
@@ -59,6 +60,83 @@ class LDAModel:
         """
 
         return [self.id2word.doc2bow(text) for text in text_data]
+
+    def create_tfidf_corpus(self):
+
+        # Initialize gensim's TF-IDF
+        tfidf = TfidfModel(self.corpus, self.id2word)
+
+        # Convert corpus to tfidf-corpus
+        self.corpus = tfidf[self.corpus]
+
+        return self
+
+    def filter_low_tfidf(self, text_data, min_tfidf_score=0.01, keep_fraction=None):
+        """
+        Filter out tokens in the dictionary (id2word) by their tf-idf score.
+        Parameters:
+            - text_data
+            - min_tfidf_score (float)
+        Output:
+            - updates self.id2word
+            - updates self.corpus
+            - returns self  
+        """
+
+        # Initialize gensim's TF-IDF
+        tfidf = TfidfModel(self.corpus, self.id2word)
+        
+        if keep_fraction:
+            # compute the distribution of scores
+            id_to_scores = {}
+            for bow in tfidf[self.corpus]:
+                for tupl in bow:
+                    ID,score = tupl
+                    id_to_scores[ID] = score
+
+            # find the score above which lies the 'keep_fraction' of the tokens
+            min_tfidf_score = np.percentile(list(id_to_scores.values()), (1-keep_fraction)*100)
+
+        # filter out tokena with scores below min_tfidf_score
+        low_score_tokens = []
+        for bow in self.corpus:
+            low_score_tokens += [ID for ID,score in tfidf[bow] if score < min_tfidf_score]
+
+        # update dictionary (id2word) and corpus
+        self.id2word.filter_tokens(bad_ids=low_score_tokens)
+        self.corpus = self.create_corpus(text_data)            
+
+        return self
+
+
+    def filter_extremes(self, text_data, no_below=5, no_above=0.5, keep_n=100000, keep_tokens=None):
+        """
+        Filter out tokens in the dictionary (id2word) by their frequency.
+        Parameters:
+            - text_data
+            - no_below (int, optional): Keep tokens which are contained in at least no_below documents.
+            - no_above (float, optional): Keep tokens which are contained in no more than no_above documents 
+            (fraction of total corpus size, not an absolute number).
+            - keep_n (int, optional): Keep only the first keep_n most frequent tokens.
+            - keep_tokens (iterable of str): Iterable of tokens that must stay in dictionary after filtering.
+        Notes:
+        This removes all tokens in the dictionary that are:
+            1. Less frequent than no_below documents (absolute number, e.g. 5) or
+            2. More frequent than no_above documents (fraction of the total corpus size, e.g. 0.3).
+            3. After (1) and (2), keep only the first keep_n most frequent tokens (or keep all if keep_n=None).
+
+        Output:
+            - updates self.id2word
+            - updates self.corpus
+            - returns self  
+         """
+
+        self.id2word.filter_extremes(no_below=5, no_above=0.5, keep_n=100000, keep_tokens=None)
+        self.corpus = self.create_corpus(text_data)
+
+        return self
+
+    
 
 
     def build_model(self, params, lda_class='single'):
@@ -85,8 +163,8 @@ class LDAModel:
         elif lda_class == 'multi':
             self.lda_model = LdaMulticore(corpus=self.corpus, id2word=self.id2word, **params)
         elif lda_class == 'mallet':
-            os.environ.update({'MALLET_HOME':'../covid/models/topicmodeling/mallet-2.0.8/'}) 
-            mallet_path = '../covid/models/topicmodeling/mallet-2.0.8/bin/mallet'
+            os.environ.update({'MALLET_HOME': MALLET_DIR}) #'../covid/models/topicmodeling/mallet-2.0.8/'
+            mallet_path = MALLET_DIR + 'bin/mallet'
             mallet_model = LdaMallet(mallet_path, corpus=self.corpus, id2word=self.id2word, **params)
             self.lda_model = malletmodel2ldamodel(mallet_model)
 
@@ -175,16 +253,16 @@ class LDAModel:
 
     def compute_f1_score(self, average='macro', verbose=False):
 
-        if self.meta_corpus is None:
-            raise ValueError('self.meta_corpus is None')
+        if self.test_corpus is None:
+            raise ValueError('self.test_corpus is None')
 
-        if len(self.meta_corpus)!= len(self.corpus):
-            raise ValueError('meta_corpus and corpus must have the same lengths')
+        if len(self.test_corpus)!= len(self.corpus):
+            raise ValueError('test_corpus and corpus must have the same lengths')
         
-        meta_preds = self.predict_topics(self.meta_corpus)
+        test_preds = self.predict_topics(self.test_corpus)
         text_preds = self.predict_topics(self.corpus)
 
-        self.f1_score = f1_score(text_preds, meta_preds, average=average)
+        self.f1_score = f1_score(text_preds, test_preds, average=average)
 
         if verbose:
             print('\nf1-score: ', self.f1_score)
