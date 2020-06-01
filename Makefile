@@ -18,6 +18,12 @@ comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/l
 non_comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/noncomm_use_subset.tar.gz
 cust_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/custom_license.tar.gz
 
+forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
+forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
+forecast_US_death = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv
+forecast_global_death = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv
+forecast_global_recovered = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv
+
 
 ifeq (,$(shell which conda))
 HAS_CONDA=False
@@ -60,6 +66,19 @@ download_data:
 	@echo ">>> Unzipping."
 	tar xvzf data/raw/custom_license.tar.gz -C data/raw
 
+download_forecasting_data:
+	@echo ">>> Downloading Forecasting data from John Hopkins"
+	@echo ">>> Downloading data confirmed cases USA"
+	curl -o data/raw/conf_USA.csv $(forecast_US_conf)
+	@echo ">>> Downloading data death data USA"
+	curl -o data/raw/death_USA.csv $(forecast_US_death)
+	@echo ">>> Downloading data confirmed cases Global"
+	curl -o data/raw/conf_global.csv $(forecast_global_conf)
+	@echo ">>> Downloading data death data global"
+	curl -o data/raw/death_global.csv $(forecast_global_death)
+	@echo ">>> Downloading data recovered cases global"
+	curl -o data/raw/recovered_global.csv $(forecast_global_recovered)
+
 
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
@@ -73,9 +92,16 @@ data: #requirements
 join_datasets: 
 	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/ data/raw/merged_raw_data.csv metadata.csv ["bioarxiv.csv","comm_use_subset.csv","noncomm_use_subset.csv","custom_license.csv"]
 
-## Query Datasets
-query_data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/query_data.py data/raw/ data/filtered/ metadata.csv ["title","abstract"]
+## Preprocess Datasets
+preproc_dataset: #location and affilliations classification
+	###### get location for all papers around 2hrs run time
+	# $(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/raw/merged_raw_data.csv data/processed/merged_raw_data.csv 11
+	###### get location for covid papers only
+	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_merged_covid.csv data/processed/classified_merged_covid.csv 11
+
+## Classify Datasets
+classify_data: #requirements
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
 
 ## Delete all compiled Python files
 clean:
