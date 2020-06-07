@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# Utilities
+# Utilitieswhic
 from covid.models.topicmodeling.ldamodel import LDAModel
 from covid.models.topicmodeling.utilities.constants import COMMON_PHRASES_REGEX, COMMON_WORDS
 from covid.models.topicmodeling.utilities.functions import *
@@ -25,13 +25,13 @@ TOP_DIR = str(Path.cwd().parents[2])
 print("1. Preparing Text Data\n")
 
 file_path = TOP_DIR + '/data/paperclassifier/classified_merged_covid.csv'
-class_cols = ['diagnostic'] #input
-df = load_paper_data(file_path, 
-                    class_cols, 
+df = pd.read_csv(file_path, parse_dates=['publish_time'])
+df = process_pcf_data(df, 
                     bad_phrases=COMMON_PHRASES_REGEX, 
                     bad_tokens=COMMON_WORDS, 
                     drop_nan_text=True, 
                     from_date='2020-01-01')
+
 
 text_data = df['clean_text'].values.tolist()
 
@@ -50,6 +50,10 @@ param_grid_mallet = {
     'workers': [1]
 }
 
+param_grid_mallet = {
+    'num_topics': list(range(5,6,1)),
+    'passes': [3],
+}
 
 tfidf_grid = [0.25, 0.50, 0.75, 0.90]
 
@@ -63,7 +67,7 @@ for fraction in tqdm(tfidf_grid):
     # run grid-search: automatically assigns best model to LDAModel
     _ = temp_lda.grid_search(text_data, 
                              param_grid=param_grid_mallet, 
-                             lda_class='mallet', 
+                             lda_class='single', 
                              scorers=scorers
                              )
 
