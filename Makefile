@@ -57,15 +57,15 @@ download_data:
 download_forecasting_data:
 	@echo ">>> Downloading Forecasting data from John Hopkins"
 	@echo ">>> Downloading data confirmed cases USA"
-	curl -o data/raw/conf_USA.csv $(forecast_US_conf)
+	curl -o data/raw/$(date_str)/conf_USA.csv $(forecast_US_conf)
 	@echo ">>> Downloading data death data USA"
-	curl -o data/raw/death_USA.csv $(forecast_US_death)
+	curl -o data/raw/$(date_str)/death_USA.csv $(forecast_US_death)
 	@echo ">>> Downloading data confirmed cases Global"
-	curl -o data/raw/conf_global.csv $(forecast_global_conf)
+	curl -o data/raw/$(date_str)/conf_global.csv $(forecast_global_conf)
 	@echo ">>> Downloading data death data global"
-	curl -o data/raw/death_global.csv $(forecast_global_death)
+	curl -o data/raw/$(date_str)/death_global.csv $(forecast_global_death)
 	@echo ">>> Downloading data recovered cases global"
-	curl -o data/raw/recovered_global.csv $(forecast_global_recovered)
+	curl -o data/raw/$(date_str)/recovered_global.csv $(forecast_global_recovered)
 
 
 ## Make Dataset
