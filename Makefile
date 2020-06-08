@@ -71,10 +71,7 @@ download_forecasting_data:
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
 data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/biorxiv_medrxiv/pdf_json/ data/processed/ bioarxiv.csv ["title","abstract"] False
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/comm_use_subset/pdf_json/ data/processed/ comm_use_subset.csv ["title","abstract"] False
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/noncomm_use_subset/pdf_json/ data/processed/ noncomm_use_subset.csv ["title","abstract"] False
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/custom_license/pdf_json/ data/processed/ custom_license.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/$(date_str)/document_parses/pdf_json/ data/raw/ merged_raw_data.csv ["title","abstract"] False
 
 #joining csv files to metadata csv
 join_datasets: 
