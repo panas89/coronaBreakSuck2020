@@ -71,11 +71,16 @@ download_forecasting_data:
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
 data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/$(date_str)/document_parses/pdf_json/ data/raw/ merged_raw_data.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/$(date_str)/document_parses/pdf_json/ data/raw/$(date_str)/ merged_raw_data.csv ["title","abstract"] False
 
-#joining csv files to metadata csv
+#joining csv files to metadata csv to get publish time
 join_datasets: 
-	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/ data/raw/merged_raw_data.csv metadata.csv ["bioarxiv.csv","comm_use_subset.csv","noncomm_use_subset.csv","custom_license.csv"]
+	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/$(date_str)/ data/raw/merged_raw_data.csv metadata.csv merged_raw_data.csv
+
+## Classify Datasets to find only covid papers reduces file size by 100 fold
+classify_data: #requirements
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
+
 
 ## Preprocess Datasets
 preproc_dataset: #location and affilliations classification
@@ -84,9 +89,6 @@ preproc_dataset: #location and affilliations classification
 	###### get location for covid papers only
 	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_merged_covid.csv data/processed/classified_merged_covid.csv 11
 
-## Classify Datasets
-classify_data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
 
 ## Delete all compiled Python files
 clean:
