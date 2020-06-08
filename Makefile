@@ -81,7 +81,6 @@ join_datasets:
 classify_data: #requirements
 	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
 
-
 ## Preprocess Datasets
 preproc_dataset: #location and affilliations classification
 	###### get location for all papers around 2hrs run time
