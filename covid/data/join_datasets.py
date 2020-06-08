@@ -10,25 +10,21 @@ import pandas as pd
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
 @click.argument('filename', type=click.Path())
-@click.argument('dataset_names', type=click.Path())
-def main(input_filepath, output_filepath, filename, dataset_names):
+@click.argument('dataset_name', type=click.Path())
+def main(input_filepath, output_filepath, filename, dataset_name):
     """ Merges all datasets into a clean csv file
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
-    dataset_names = dataset_names.replace('[','').replace(']','').split(',')
-    
+    logger.info('making final data set from raw data')    
     
     df = pd.read_csv(input_filepath+filename,parse_dates=True)
 
-    frames = [pd.read_csv(input_filepath+dataset,parse_dates=True) for dataset in dataset_names]
-
-    df_datasets = pd.concat(frames,axis=0)
+    df_dataset = pd.read_csv(input_filepath+dataset_name,parse_dates=True)
 
     logger.info('joining data')
     
 
-    df = df.merge(df_datasets,how='left',
+    df = df.merge(df_dataset,how='left',
                               left_on=['sha','title'],
                               right_on=['paper_id','title'],
                               validate='m:m') 
