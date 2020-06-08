@@ -11,12 +11,10 @@ PROJECT_NAME = coronaBreakSuck2020
 PYTHON_INTERPRETER = python3
 
 # url to download data
+date_str = $(shell date +'%Y-%m-%d')
 
-metadata_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-10/metadata.csv
-medrxiv_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-04-03/biorxiv_medrxiv.tar.gz
-comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/comm_use_subset.tar.gz
-non_comm_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/noncomm_use_subset.tar.gz
-cust_DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/custom_license.tar.gz
+DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
+
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
@@ -47,24 +45,14 @@ save_requirements:
 ## Download datasets
 download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
-	curl -o data/raw/metadata.csv $(metadata_DATA_URL)
-	@echo ">>> Downloading data from Semantic Scholar"
-	@echo ">>> Downloading medarxiv json files"
-	curl -o data/raw/biorxiv_medrxiv.tar.gz $(medrxiv_DATA_URL)
+	@echo ">>> Downloading data files of $(date_str)"
+	curl -o data/raw/cord-19_$(date_str).tar.gz $(DATA_URL)
 	@echo ">>> Unzipping."
-	tar xvzf data/raw/biorxiv_medrxiv.tar.gz -C data/raw
-	@echo ">>> Downloading commercial data json files"
-	curl -o data/raw/comm_use_subset.tar.gz $(comm_DATA_URL)
-	@echo ">>> Unzipping."
-	tar xvzf data/raw/comm_use_subset.tar.gz -C data/raw
-	@echo ">>> Downloading non commercial data json files"
-	curl -o data/raw/noncomm_use_subset.tar.gz $(non_comm_DATA_URL)
-	@echo ">>> Unzipping."
-	tar xvzf data/raw/noncomm_use_subset.tar.gz -C data/raw
-	@echo ">>> Downloading custom data json files"
-	curl -o data/raw/custom_license.tar.gz $(cust_DATA_URL)
-	@echo ">>> Unzipping."
-	tar xvzf data/raw/custom_license.tar.gz -C data/raw
+	tar xvzf data/raw/cord-19_$(date_str).tar.gz -C data/raw
+	@echo ">>> Unzipping. $(date_str) embeddings"
+	tar xvzf data/raw/$(date_str)/cord_19_embeddings.tar.gz -C data/raw/$(date_str)
+	@echo ">>> Unzipping. $(date_str) document parses"
+	tar xvzf data/raw/$(date_str)/document_parses.tar.gz -C data/raw/$(date_str)
 
 download_forecasting_data:
 	@echo ">>> Downloading Forecasting data from John Hopkins"
