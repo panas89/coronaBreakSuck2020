@@ -105,7 +105,7 @@ def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date
 
     print('Fraction of selected papers: {}/{}'.format(len(df), NUM_PAPERS))
     
-    return df.reset_index(drop=True)
+    return df #.reset_index(drop=True)
 
 
 #------------------------ DataFrame Methods -------------------------
