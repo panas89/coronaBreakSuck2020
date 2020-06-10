@@ -63,13 +63,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
         'workers': [1]
     }
 
-    param_grid_mallet = {
-        'num_topics': range_num_topics(NUM_PAPERS),
-        'passes': [3],
-    }
-
     tfidf_grid = [0.25, 0.50, 0.75, 0.90]
-    tfidf_grid = [0.25,]
 
     scorers = ['coherence_score'] 
 
@@ -81,7 +75,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
         # run grid-search: automatically assigns best model to LDAModel
         _ = temp_lda.grid_search(text_data, 
                                 param_grid=param_grid_mallet, 
-                                lda_class='single', 
+                                lda_class='mallet', 
                                 scorers=scorers
                                 )
 
