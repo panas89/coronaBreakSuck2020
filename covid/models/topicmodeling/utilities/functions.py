@@ -80,13 +80,13 @@ def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date
     # Treat NaNs
     if drop_nan_text:
         df.dropna(subset=['text'], axis=0, inplace=True)
-    df[['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
+    df.loc[:,['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
     
     # Create meta col
-    df['abstract'] = df['abstract'].apply(lambda x: x[len('abstract'):] 
+    df.loc[:,'abstract'] = df.loc[:,'abstract'].apply(lambda x: x[len('abstract'):] 
                                           if x[:len('abstract')].lower() == 'abstract' 
                                           else x) # remove string 'abstract' from abstract col
-    df['meta'] = df['title'] + ' ' + df['abstract']
+    df.loc[:,'meta'] = df['title'] + ' ' + df['abstract']
     
     # Clean cols
     text_cleaner = partial(preprocess_text,
@@ -98,10 +98,10 @@ def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date
                            replace_num=False,
                            replace_contr=False)
 
-    df['clean_title'] = df['title'].apply(lambda x: text_cleaner(x))
-    df['clean_abstract'] = df['abstract'].apply(lambda x: text_cleaner(x))
-    df['clean_text'] = df['text'].apply(lambda x: text_cleaner(x))
-    df['clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_title'] = df['title'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_abstract'] = df['abstract'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_text'] = df['text'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
 
     print('Fraction of selected papers: {}/{}'.format(len(df), NUM_PAPERS))
     
