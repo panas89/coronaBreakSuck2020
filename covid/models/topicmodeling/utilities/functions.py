@@ -71,6 +71,47 @@ def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens, drop_nan_tex
 #------------------------ DataFrame Methods -------------------------
 
 
+def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date='2020-01-01'):
+    
+    NUM_PAPERS = len(df)
+    
+    # Select only papers published from/after 'from_date'
+    df = df[df.publish_time >= from_date]
+    
+    # Treat NaNs
+    if drop_nan_text:
+        df.dropna(subset=['text'], axis=0, inplace=True)
+    df.loc[:,['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
+    
+    # Create meta col
+    df.loc[:,'abstract'] = df.loc[:,'abstract'].apply(lambda x: x[len('abstract'):] 
+                                          if x[:len('abstract')].lower() == 'abstract' 
+                                          else x) # remove string 'abstract' from abstract col
+    df.loc[:,'meta'] = df['title'] + ' ' + df['abstract']
+    
+    # Clean cols
+    text_cleaner = partial(preprocess_text,
+                           bad_phrases=bad_phrases, 
+                           bad_tokens=bad_tokens, 
+                           min_char=3, 
+                           pos_tags=['v', 'n'], 
+                           remove_dig=True, 
+                           replace_num=False,
+                           replace_contr=False)
+
+    df.loc[:,'clean_title'] = df['title'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_abstract'] = df['abstract'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_text'] = df['text'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
+
+    print('Fraction of selected papers: {}/{}'.format(len(df), NUM_PAPERS))
+    
+    return df #.reset_index(drop=True)
+
+
+#------------------------ DataFrame Methods -------------------------
+
+
 def gs_models_to_df(gs_models, scorers):
     data = defaultdict(list)
     for model, d in gs_models.items():
