@@ -125,8 +125,7 @@ dmypy.json
 .pyre/
 
 # Directories to be ignored
-Data/
-data/
+.data/
 plotly/
 vasilis/
 
