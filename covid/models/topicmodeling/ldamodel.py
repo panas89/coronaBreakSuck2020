@@ -28,7 +28,7 @@ from sklearn.metrics import f1_score
 # LdaModel[corpus][i][2] = list((token_vocab_key, [(topic_no, probability)])
 
 CUR_DIR = str(Path(__file__).parents[0])
-MALLET_DIR= CUR_DIR + '/Mallet/'
+MALLET_DIR= CUR_DIR + '/mallet-2.0.8/'
 
 class LDAModel:
 
@@ -163,9 +163,8 @@ class LDAModel:
         elif lda_class == 'multi':
             self.lda_model = LdaMulticore(corpus=self.corpus, id2word=self.id2word, **params)
         elif lda_class == 'mallet':
-            # os.environ.update({'MALLET_HOME': MALLET_DIR}) #'../covid/models/topicmodeling/mallet-2.0.8/'
+            os.environ.update({'MALLET_HOME': MALLET_DIR}) #'../covid/models/topicmodeling/mallet-2.0.8/'
             mallet_path = MALLET_DIR + 'bin/mallet'
-
             mallet_model = LdaMallet(mallet_path, corpus=self.corpus, id2word=self.id2word, **params)
             self.lda_model = malletmodel2ldamodel(mallet_model)
 
