@@ -88,6 +88,10 @@ preproc_dataset: #location and affilliations classification
 	###### get location for covid papers only
 	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_merged_covid.csv data/processed/classified_merged_covid.csv 11
 
+## Run topic modelling over covid corpus
+make_topics:
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py
+
 
 ## Delete all compiled Python files
 clean:
