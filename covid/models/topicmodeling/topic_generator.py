@@ -20,7 +20,7 @@ from gensim.models import Phrases
 
 #-------------------------- Global Vars/Functions ----------------------------
 
-TOP_DIR = str(Path.cwd().parents[2])
+TOP_DIR = str(Path.cwd())
 
 def range_num_topics(num_papers):
     upper = max(2, num_papers//10) + 1
