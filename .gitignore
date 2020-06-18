@@ -129,6 +129,9 @@ dmypy.json
 plotly/
 vasilis/
 
+# Ignoring Mallet --  follow readme in topicmodelling file for setup
+/covid/models/topicmodeling/Mallet
+
 # Ignore vs code
 .vscode/
 
