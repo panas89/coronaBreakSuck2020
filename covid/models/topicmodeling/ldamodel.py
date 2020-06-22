@@ -28,7 +28,7 @@ from sklearn.metrics import f1_score
 # LdaModel[corpus][i][2] = list((token_vocab_key, [(topic_no, probability)])
 
 CUR_DIR = str(Path(__file__).parents[0])
-MALLET_DIR= CUR_DIR + '/mallet-2.0.8/'
+MALLET_DIR= CUR_DIR + '/Mallet/'
 
 class LDAModel:
 
