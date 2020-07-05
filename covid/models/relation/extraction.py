@@ -122,24 +122,3 @@ class RelationExtractor(object):
                 bn_closest = bn
                 closest_dist = dist
         return bn_closest
-        
-        
-        
-        
-        
-        
-        
-                
-            
-            
-
-        
-        
-
-            
-
-
-
-
-
-
