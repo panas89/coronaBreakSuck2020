@@ -121,7 +121,10 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
     with open(SAVE_DIR + 'model.pickle', 'wb') as handle:
         pickle.dump(best_model, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    print(f'\n4. Saved Classified Papers and Best LDA Models in {SAVE_DIR}')
+    with open(SAVE_DIR + 'vis.pickle', 'wb') as handle:
+        pickle.dump(best_model.getLDAVisualization(), handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print(f'\n4. Saved Classified Papers and Best LDA Models with Vis in {SAVE_DIR}')
 
 
     return df_topics.loc[:,['dominant_topic', 'topic_keywords']]
