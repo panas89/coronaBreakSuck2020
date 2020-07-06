@@ -18,6 +18,9 @@ from gensim.models.ldamodel import LdaModel
 from gensim.models.wrappers import LdaMallet
 from gensim.models.wrappers.ldamallet import malletmodel2ldamodel
 
+# Visualization
+import pyLDAvis.gensim
+
 # Sklearn
 from sklearn.model_selection import ParameterGrid
 from sklearn.metrics import f1_score
@@ -359,6 +362,13 @@ class LDAModel:
             if topic_prob > topic_to_id_prob[dominant_topic][1]:
                 topic_to_id_prob[dominant_topic] = (ID, topic_prob)
 
-        return dict((topic_no, ID) for topic_no,(ID, prob) in topic_to_id_prob.items())             
+        return dict((topic_no, ID) for topic_no,(ID, prob) in topic_to_id_prob.items())        
+
+    def getLDAVisualization(self):
+        """
+        Method to get the LDA visualization object.
+        """
+
+        return pyLDAvis.gensim.prepare(self.lda_model, corpus=self.corpus, dictionary=self.id2word)
 
     
