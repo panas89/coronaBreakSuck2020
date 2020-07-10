@@ -137,7 +137,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
 print("Loading & Cleaning The Data\n")
 
 # Load paperclassified data
-file_path = TOP_DIR + '/data/paperclassifier/classified_merged_covid.csv'
+file_path = TOP_DIR + '/data/processed/classified_merged_covid.csv'
 df = pd.read_csv(file_path, parse_dates=['publish_time'])
 df = process_pcf_data(df, 
                     bad_phrases=COMMON_PHRASES_REGEX, 
