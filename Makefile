@@ -11,8 +11,8 @@ PROJECT_NAME = coronaBreakSuck2020
 PYTHON_INTERPRETER = python3
 
 # url to download data
-#date_str = $(shell date +'%Y-%m-%d')
-date_str = $(shell date +%Y-%m-%d -d "1 days ago")
+# date_str = $(shell date +'%Y-%m-%d')
+date_str = $(shell date +%Y-%m-%d -d "2 days ago")
 
 DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
@@ -101,7 +101,7 @@ clean:
 
 ## Lint using flake8
 lint:
-	flake8 src
+	flake8 covid
 
 ## Upload Data to S3
 sync_data_to_s3:
