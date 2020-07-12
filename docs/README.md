@@ -4,4 +4,7 @@
     2. Created a knowledge base that contains a lot of keywords that make senses to doctor
         1. Knowledge base: e.g., MeSH term
     3. The topic modeling keyword results should be presented after filtering by the knowledge base and then by whether the keywords have strong relationship (via the relation extractor)
-2. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only), by region (where the publication is published). 
+2. Upgrade the interest.yaml to include more relevant medical keywords (e.g., treatment)
+3. Visualziation upgrade:
+    1. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only), by region (where the publication is published). 
+    2. Make it pretty
