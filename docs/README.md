@@ -8,6 +8,6 @@
     1. from David (Panayiotis)
 3. Visualziation upgrade:
     1. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only or by journal name), by region (where the publication is published). 
-    2. Incorporate the relation extractor result for the interest keyword; as an indepedent app in DASH (Johnny)
-    3. Make it pretty (later)
+    2. Incorporate the relation extractor result for the interest keywords; as an indepedent app in DASH (Johnny)
+    3. Make it pretty (Johnny)
    
