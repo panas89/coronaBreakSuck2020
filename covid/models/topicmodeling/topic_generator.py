@@ -5,6 +5,10 @@ from tqdm import tqdm
 from pathlib import Path
 import yaml
 
+import click
+import logging
+from pathlib import Path
+from dotenv import find_dotenv, load_dotenv
 
 # Arrays & Dataframes
 import numpy as np
@@ -134,47 +138,66 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
 
 #-------------------------- MAIN -------------------------
 
-print("Loading & Cleaning The Data\n")
+@click.command()
+@click.argument('yaml_filepath', type=click.Path())
+def main(yaml_filepath):
 
-# Load paperclassified data
-file_path = TOP_DIR + '/data/processed/classified_merged_covid.csv'
-df = pd.read_csv(file_path, parse_dates=['publish_time'])
-df = process_pcf_data(df, 
-                    bad_phrases=COMMON_PHRASES_REGEX, 
-                    bad_tokens=COMMON_WORDS, 
-                    drop_nan_text=True, 
-                    from_date='2020-01-01')
+    print("Loading & Cleaning The Data\n")
 
-# Obtain class/subclass strings from yaml
-yaml_path = TOP_DIR + '/covid/models/paperclassifier/interest.yaml'
-with open(yaml_path) as f:
-    yaml_dict = yaml.load(f, Loader=yaml.FullLoader)
+    # Load paperclassified data
+    file_path = TOP_DIR + '/data/processed/classified_merged_covid.csv'
+    df = pd.read_csv(file_path, parse_dates=['publish_time'])
+    df = process_pcf_data(df, 
+                        bad_phrases=COMMON_PHRASES_REGEX, 
+                        bad_tokens=COMMON_WORDS, 
+                        drop_nan_text=True, 
+                        from_date='2020-01-01')
 
-CLASSES = list(yaml_dict.keys())
-CLASSES.remove('disease_name') #already used for Covid selection
-SUBCLASSES = []
-for c in CLASSES:
-    subclasses_of_c = list(yaml_dict[c].keys())
-    SUBCLASSES.extend(subclasses_of_c)
+    # Obtain class/subclass strings from yaml
+    yaml_path = TOP_DIR + '/' + yaml_filepath
+    with open(yaml_path) as f:
+        yaml_dict = yaml.load(f, Loader=yaml.FullLoader)
 
-# Learn topics for each class/subclass
-bad_cols = []
-for class_col in CLASSES+SUBCLASSES:
-    try:
-        # Learn topics for papers with class_col tag
-        df_topics = learn_topics(df, class_col, train_on_col='clean_text')
+    CLASSES = list(yaml_dict.keys())
+    CLASSES.remove('disease_name') #already used for Covid selection
+    SUBCLASSES = []
+    for c in CLASSES:
+        subclasses_of_c = list(yaml_dict[c].keys())
+        SUBCLASSES.extend(subclasses_of_c)
 
-        # Append topic-tags/topic-keywords cols to df
-        df = df.join(df_topics)
-        df.loc[:,'dominant_topic'] = df['dominant_topic'].fillna(-1).astype('int')
-        df.loc[:,'topic_keywords'] = df['topic_keywords'].fillna(0)
-        df.rename({'dominant_topic': class_col + '_topic',
-                   'topic_keywords': class_col + '_topic_kw'
-                  }, axis=1, inplace=True)
-    except:
-        bad_cols.append(class_col)
-    
-print("Bad columns:", bad_cols)
+    # Learn topics for each class/subclass
+    bad_cols = []
+    for class_col in CLASSES+SUBCLASSES:
+        try:
+            # Learn topics for papers with class_col tag
+            df_topics = learn_topics(df, class_col, train_on_col='clean_abstract')
 
-df.to_csv(TOP_DIR + '/data/topicmodels/pcf_topic_data.csv', index=False)
-print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_topic_data.csv')
+            # Append topic-tags/topic-keywords cols to df
+            df = df.join(df_topics)
+            df.loc[:,'dominant_topic'] = df['dominant_topic'].fillna(-1).astype('int')
+            df.loc[:,'topic_keywords'] = df['topic_keywords'].fillna(0)
+            df.rename({'dominant_topic': class_col + '_topic',
+                    'topic_keywords': class_col + '_topic_kw'
+                    }, axis=1, inplace=True)
+        except:
+            bad_cols.append(class_col)
+        
+    print("Bad columns:", bad_cols)
+
+    df.to_csv(TOP_DIR + '/data/topicmodels/pcf_topic_data.csv', index=False)
+    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_topic_data.csv')
+
+
+
+if __name__ == '__main__':
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=log_fmt)
+
+    # not used in this stub but often useful for finding various files
+    project_dir = Path(__file__).resolve().parents[2]
+
+    # find .env automagically by walking up directories until it's found, then
+    # load up the .env entries as environment variables
+    load_dotenv(find_dotenv())
+
+    main()
