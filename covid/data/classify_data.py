@@ -27,6 +27,7 @@ def main(input_filepath, output_filepath,yaml_filepath):
 
     logger.info('Classifying ...')
     # Load the paperclassifier
+    print('Yaml file:',yaml_filepath)
     pc = PaperClassifier(km_path=yaml_filepath)
 
     # Preprocess the dataframe text
