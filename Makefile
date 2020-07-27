@@ -24,6 +24,9 @@ forecast_global_death = https://raw.githubusercontent.com/CSSEGISandData/COVID-1
 forecast_global_recovered = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv
 
 
+#yaml_path = covid/models/paperclassifier/interest.yaml
+yaml_path = covid/models/paperclassifier/Davids_interest.yaml
+
 ifeq (,$(shell which conda))
 HAS_CONDA=False
 else
@@ -80,7 +83,8 @@ join_datasets:
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv covid/models/paperclassifier/interest.yaml
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/merged_raw_data.csv data/paperclassifier/classified_merged_covid.csv $(yaml_path)
+
 
 ## Preprocess Datasets
 preproc_dataset: #location and affilliations classification
@@ -91,7 +95,7 @@ preproc_dataset: #location and affilliations classification
 
 ## Run topic modelling over covid corpus
 make_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path)
 
 
 ## Delete all compiled Python files
