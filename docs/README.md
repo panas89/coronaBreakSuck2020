@@ -1,3 +1,17 @@
+# 08/03/20 Improvement plan
+
+Panayiotis:
+1. Explore the external datasets (datasets, and clinical trials) from dimension.ai
+2. Explore funding options for our projects.
+3. Implement the "buy us a coffee" buttom. 
+
+Johnny: 
+1. Visualziation upgrade:
+    1. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only or by journal name), by region (where the publication is published). 
+    2. Incorporate the relation extractor result for the interest keywords; as an indepedent app in DASH (Johnny)
+    3. Make it pretty (Johnny)
+
+
 # 07/12/20 Improvement plan
 1. Focus on keywords that make more senes to doctors in topic modeling result presentation; filter away phrases that are not medical-related and not doctor-understandable in topic modeling
     1. Use abstract only for topic-modeling (Vasili, Panayiotis)
