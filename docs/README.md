@@ -6,7 +6,8 @@ Panayiotis:
 3. Implement the "buy us a coffee" buttom. 
 
 Johnny: 
-1. Visualziation upgrade:
+1. Implement a new function to extract relations of a list of keywords without respect to the covid-19 (through our papers sources). This is for Panayiotis new ideas for relationship extraction. 
+2. Visualziation upgrade:
     1. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only or by journal name), by region (where the publication is published). 
     2. Incorporate the relation extractor result for the interest keywords; as an indepedent app in DASH (Johnny)
     3. Make it pretty (Johnny)
