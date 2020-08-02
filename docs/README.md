@@ -12,6 +12,9 @@ Johnny:
     2. Incorporate the relation extractor result for the interest keywords; as an indepedent app in DASH (Johnny)
     3. Make it pretty (Johnny)
 
+Vasili:
+TBD (topic modeling)
+
 
 # 07/12/20 Improvement plan
 1. Focus on keywords that make more senes to doctors in topic modeling result presentation; filter away phrases that are not medical-related and not doctor-understandable in topic modeling
