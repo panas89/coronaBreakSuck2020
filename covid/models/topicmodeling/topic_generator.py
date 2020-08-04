@@ -67,7 +67,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
         'workers': [1]
     }
 
-    tfidf_grid = [0.25, 0.50, 0.75, 0.90]
+    tfidf_grid = [0.05, 0.10,0.15,0.20,0.25, 0.50, 0.75, 0.90]
 
     scorers = ['coherence_score'] 
 
