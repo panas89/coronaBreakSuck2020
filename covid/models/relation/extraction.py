@@ -47,6 +47,10 @@ class RelationExtractor(object):
             # assign head and tails
             e1 = doc.ents[0].string.strip()
             e2 = doc.ents[1].string.strip()
+        else:
+            texts = text.split()
+            if e1 not in texts or e2 not in texts:
+                return None
             
         # get the index of the entity
         index1 = text.find(e1)
