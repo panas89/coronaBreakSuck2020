@@ -1,0 +1,58 @@
+# This yaml defines the subjects of interests (classes) for covid-paper.
+# It contains not only the subjects of interests, but also the synonyms of it
+# This is the basic but important keywords that we define for 
+# the subject of interest. We can furthur use nltk synompns library 
+# or word2vec this easily
+
+# level: class --> subclass --> keywords
+
+# Since we are using nltk to expand the synonyms. Some time, nltk
+# does not work well (e.g., "exercise" synonyms include "do"). Therefore
+# we will manually check and determine whether a sublcass should use
+# nltk to expand it
+
+# Here is the list of resources:
+# https://drive.google.com/file/d/1ZaiDO87me4puBte-8VytcSRtpQ3PVpkK/view?fbclid=IwAR1bf4S36gyjLXt-HpTpShOVdpY6OcZIh5yDe7RlkrM5SY6MB9q1ZLbii3A
+
+disease_name:
+    disease_common_name:
+        kw: ['covid', 'sars-cov-2', 'covid19', 'coronavirus']
+        allow_nltk_expand: False
+    relate_to:
+        kw: ['respiratory syncytial virus', 'lipopolysaccharide', 
+             'rubella virus infection', 'human immunodeficiency virus', 'Zika Virus Infection',
+             'Ebola and Zika virus infection', 'influenza virus A', 
+             'Thrombocytopenia Syndrome Virus Infection', 'respiratory syncitial virus',
+             'herpes simplex virus type 1', 'human immunodeficiency virus type 1', 
+             'porcine reproductive and respiratory syndrome virus', 'hepatitis A virus',
+             'parainfluenza virus 3', 'neurotropic coronavirus virus', 
+             'Human T-cell leukemia virus type 1', 'Human T-cell leukemia virus type'
+             ]
+        allow_nltk_expand: False
+
+risk_factor:
+    risk_factor_common_name:
+        kw: ['Risk factors','Epidemiologic studies','Odds ratio','Multivariate analysis',
+             'Logistic Models','Prevalence','Incidence','odds ratio','risk ratio','relative risk',
+             'risk factor',risk,predict*,correlat*,etiol*,aetiol*,prevalence,incidence,rate*,
+             'cohort','predictive model','Predicts','machine learning model','machine learning-based model',
+             'survival','survival prediction','clinical characteristics','Clinical features','Epidemiological',
+             'Severe Illness','Critically Ill','Outcomes','Characteristics']
+        allow_nltk_expand: False 
+        
+treatment_and_vaccine:
+    treatment_and_vaccine_common_name: 
+        kw: ['treatment', 'vaccine', 'intervention']
+        allow_nltk_expand: True
+
+    treatment:
+        kw: ['Inhibitors of','Inhibits','Clinical Trial',
+             'Favipiravir','Umifenavir (Arbidol)','Predict','Treatment','Hydroxychloroquine',
+             'Chloroquine','Interferon','Lopinavir','Kaletra',
+             'Darunavir','Oseltamavir','Azithromycin','Nucleotide',
+             'Drugs against','Drug candidates','Convalescent Serum (Sera)','Vaccine',
+             'Neutralizing antibodies','Stem cells','Redemsivir','Activity']
+        allow_nltk_expand: False
+
+
+
