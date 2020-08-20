@@ -1,3 +1,21 @@
+# 08/20/20 Improvement plan
+Johnny: 
+1. Implement the end-to-end script to extract all the relations from an excel sheet. 
+2. Visualziation upgrade:
+    1. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only or by journal name), by region (where the publication is published). 
+    2. Incorporate the relation extractor result for the interest keywords; as an indepedent app in DASH (Johnny)
+    3. Make it pretty (Johnny)
+    
+Panayiotis:
+1. Incorporate the external datasets (datasets, and clinical trials) from dimension.ai into the dash dashboard
+2. Explore funding options for our projects.
+3. Implement the "buy us a coffee" buttom. 
+
+Vasili:
+1. Clean up the UI
+2. Integrate the MESH script to upgrade the interest.yaml file. 
+
+
 # 08/03/20 Improvement plan
 
 Panayiotis:
