@@ -20,7 +20,7 @@ def main(input_filepath, output_filepath,yaml_filepath):
     logger.info('reading data')
     print(input_filepath)
 
-    USE_COLS = ['sha', 'title', 'abstract_x','affiliations', 'location','text', 'publish_time']
+    USE_COLS = ['sha', 'title', 'abstract_x','affiliations', 'location','text', 'publish_time','doi']
     df = pd.read_csv(input_filepath, usecols=USE_COLS)\
         .rename({'abstract_x': 'abstract'}, axis=1)
     NUM_PAPERS = len(df) 
