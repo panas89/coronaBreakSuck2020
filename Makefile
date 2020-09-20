@@ -12,7 +12,7 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = $(shell date +%Y-%m-%d -d "3 days ago")
+date_str = $(shell date +%Y-%m-%d -d "1 days ago")
 
 DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
