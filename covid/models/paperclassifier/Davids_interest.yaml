@@ -39,6 +39,12 @@ risk_factor:
              'survival','survival prediction','clinical characteristics','Clinical features','Epidemiological',
              'Severe Illness','Critically Ill','Outcomes','Characteristics']
         allow_nltk_expand: False 
+
+kidney_disease:
+    kidney_disease_common_name:
+        kw: ['ckd','chronic kidney disease','aki','acute kidney injury',
+             'kidney','tranplant','nephropathy']
+        allow_nltk_expand: True 
         
 treatment_and_vaccine:
     treatment_and_vaccine_common_name: 
