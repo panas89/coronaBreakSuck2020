@@ -1,6 +1,6 @@
 # 08/20/20 Improvement plan
 Johnny: 
-1. Implement the end-to-end script to extract all the relations from an excel sheet. 
+1. Implement the end-to-end script to extract all the relations from an excel sheet. (Done?)
 2. Visualziation upgrade:
     1. Allow these visualization capabilities: view by paper (focus on papers with high impact factor only or by journal name), by region (where the publication is published). 
     2. Incorporate the relation extractor result for the interest keywords; as an indepedent app in DASH (Johnny)
