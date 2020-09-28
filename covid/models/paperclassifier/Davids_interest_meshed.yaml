@@ -1,0 +1,94 @@
+{disease_name: {disease_common_name: {allow_nltk_expand: false, kw: [covid, sars-cov-2,
+        coronavirus disease 2019 virus, 2019 novel coronavirus, 2019 novel coronaviruses,
+        'coronavirus, 2019 novel', 'novel coronavirus, 2019', wuhan seafood market
+          pneumonia virus, sars-cov-2 virus, sars cov 2 virus, sars-cov-2 viruses,
+        'virus, sars-cov-2', 2019-ncov, covid-19 virus, covid 19 virus, covid-19 viruses,
+        'virus, covid-19', wuhan coronavirus, 'coronavirus, wuhan', sars coronavirus
+          2, 'coronavirus 2, sars', severe acute respiratory syndrome coronavirus
+          2, covid-19, covid 19, covid-19 virus disease, covid 19 virus disease, covid-19
+          virus diseases, 'disease, covid-19 virus', 'virus disease, covid-19', covid-19
+          virus infection, covid 19 virus infection, covid-19 virus infections, 'infection,
+          covid-19 virus', 'virus infection, covid-19', 2019-ncov infection, 2019
+          ncov infection, 2019-ncov infections, 'infection, 2019-ncov', coronavirus
+          disease-19, coronavirus disease 19, 2019 novel coronavirus disease, 2019
+          novel coronavirus infection, 2019-ncov disease, 2019 ncov disease, 2019-ncov
+          diseases, 'disease, 2019-ncov', covid19, coronavirus disease 2019, 'disease
+          2019, coronavirus', sars coronavirus 2 infection, sars-cov-2 infection,
+        'infection, sars-cov-2', sars cov 2 infection, sars-cov-2 infections, covid-19
+          pandemic, covid 19 pandemic, covid-19 pandemics, 'pandemic, covid-19', coronavirus,
+        coronaviruses, 'coronavirus, rabbit', rabbit coronavirus, 'coronaviruses,
+          rabbit', rabbit coronaviruses]}, relate_to: {allow_nltk_expand: false, kw: [
+        respiratory syncytial viruses, respiratory syncytial virus, 'syncytial virus,
+          respiratory', 'syncytial viruses, respiratory', 'virus, respiratory syncytial',
+        'viruses, respiratory syncytial', chimpanzee coryza agent, chimpanzee coryza
+          agents, 'coryza agent, chimpanzee', 'coryza agents, chimpanzee', lipopolysaccharides,
+        lipoglycans, lipopolysaccharide, rubella virus infection, hiv, human immunodeficiency
+          virus, 'immunodeficiency virus, human', 'immunodeficiency viruses, human',
+        'virus, human immunodeficiency', 'viruses, human immunodeficiency', human
+          immunodeficiency viruses, human t cell lymphotropic virus type iii, human
+          t-cell lymphotropic virus type iii, human t-cell leukemia virus type iii,
+        human t cell leukemia virus type iii, lav-htlv-iii, lymphadenopathy-associated
+          virus, lymphadenopathy associated virus, lymphadenopathy-associated viruses,
+        'virus, lymphadenopathy-associated', 'viruses, lymphadenopathy-associated',
+        human t lymphotropic virus type iii, human t-lymphotropic virus type iii,
+        aids virus, aids viruses, 'virus, aids', 'viruses, aids', acquired immune
+          deficiency syndrome virus, acquired immunodeficiency syndrome virus, htlv-iii,
+        Zika Virus Infection, Ebola and Zika virus infection, influenza virus A, Thrombocytopenia
+          Syndrome Virus Infection, respiratory syncitial virus, 'herpesvirus 1, human',
+        'herpesvirus 1 (alpha), human', human herpesvirus 1, hhv-1, herpes simplex
+          virus type 1, herpes simplex virus 1, hsv-1, hiv-1, human immunodeficiency
+          virus 1, hiv-i, 'immunodeficiency virus type 1, human', human immunodeficiency
+          virus type 1, porcine respiratory and reproductive syndrome virus, swine
+          infertility and respiratory syndrome virus, porcine reproductive and respiratory
+          syndrome virus, swine infertility respiratory syndrome virus, prrsv, lelystad
+          virus, hepatitis A virus, parainfluenza virus 3, neurotropic coronavirus
+          virus, Human T-cell leukemia virus type 1, Human T-cell leukemia virus type]}},
+  kidney_disease: {kidney_disease_common_name: {allow_nltk_expand: true, kw: [ckd,
+        'renal insufficiency, chronic', chronic renal insufficiencies, 'renal insufficiencies,
+          chronic', chronic renal insufficiency, 'kidney insufficiency, chronic',
+        chronic kidney insufficiency, chronic kidney insufficiencies, 'kidney insufficiencies,
+          chronic', chronic kidney diseases, chronic kidney disease, 'disease, chronic
+          kidney', 'diseases, chronic kidney', 'kidney disease, chronic', 'kidney
+          diseases, chronic', chronic renal diseases, chronic renal disease, 'disease,
+          chronic renal', 'diseases, chronic renal', 'renal disease, chronic', 'renal
+          diseases, chronic', aki, acute kidney injury, acute kidney injuries, 'kidney
+          injuries, acute', 'kidney injury, acute', acute renal injury, acute renal
+          injuries, 'renal injuries, acute', 'renal injury, acute', 'renal insufficiency,
+          acute', acute renal insufficiencies, 'renal insufficiencies, acute', acute
+          renal insufficiency, 'kidney insufficiency, acute', acute kidney insufficiencies,
+        'kidney insufficiencies, acute', acute kidney insufficiency, 'kidney failure,
+          acute', acute kidney failures, 'kidney failures, acute', acute renal failure,
+        acute renal failures, 'renal failures, acute', 'renal failure, acute', acute
+          kidney failure, kidney, kidneys, tranplant, nephropathy]}}, risk_factor: {
+    risk_factor_common_name: {allow_nltk_expand: false, kw: [Risk factors, Epidemiologic
+          studies, Odds ratio, Multivariate analysis, Logistic Models, Prevalence,
+        Incidence, odds ratio, odds ratios, cross-product ratio, cross product ratio,
+        cross-product ratios, 'ratio, cross-product', 'ratios, cross-product', relative
+          odds, 'odds, relative', risk ratio, 'ratio, risk', 'ratios, risk', risk
+          ratios, odds ratio, odds ratios, cross-product ratio, cross product ratio,
+        cross-product ratios, 'ratio, cross-product', 'ratios, cross-product', relative
+          odds, 'odds, relative', risk ratio, 'ratio, risk', 'ratios, risk', risk
+          ratios, risk, risks, relative risk, relative risks, 'risk, relative', 'risks,
+          relative', risk factors, 'factor, risk', risk factor, health correlates,
+        'correlates, health', risk scores, risk score, 'score, risk', risk factor
+          scores, risk factor score, 'score, risk factor', population at risk, populations
+          at risk, risk, risks, relative risk, relative risks, 'risk, relative', 'risks,
+          relative', predict*, correlat*, etiol*, aetiol*, prevalence, prevalences,
+        period prevalence, period prevalences, 'prevalence, period', point prevalence,
+        point prevalences, 'prevalence, point', incidence, incidences, scondary attack
+          rate, 'attack rate, scondary', 'rate, scondary attack', scondary attack
+          rates, incidence proportion, incidence proportions, 'proportion, incidence',
+        attack rate, attack rates, 'rate, attack', cumulative incidence, cumulative
+          incidences, 'incidence, cumulative', incidence rate, incidence rates, 'rate,
+          incidence', person-time rate, person time rate, person-time rates, 'rate,
+          person-time', rate*, cohort, predictive model, Predicts, machine learning
+          model, machine learning-based model, survival, survival prediction, clinical
+          characteristics, Clinical features, Epidemiological, Severe Illness, Critically
+          Ill, Outcomes, Characteristics]}}, treatment_and_vaccine: {treatment: {
+      allow_nltk_expand: false, kw: [Inhibitors of, Inhibits, Clinical Trial, Favipiravir,
+        Umifenavir (Arbidol), Predict, Treatment, Hydroxychloroquine, Chloroquine,
+        Interferon, Lopinavir, Kaletra, Darunavir, Oseltamavir, Azithromycin, Nucleotide,
+        Drugs against, Drug candidates, Convalescent Serum (Sera), Vaccine, Neutralizing
+          antibodies, Stem cells, Redemsivir, Activity]}, treatment_and_vaccine_common_name: {
+      allow_nltk_expand: true, kw: [therapeutics, therapeutic, therapy, therapies,
+        treatment, treatments, vaccines, vaccine, intervention]}}}
