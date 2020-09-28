@@ -25,7 +25,9 @@ forecast_global_recovered = https://raw.githubusercontent.com/CSSEGISandData/COV
 
 
 #yaml_path = covid/models/paperclassifier/interest.yaml
-yaml_path = covid/models/paperclassifier/Davids_interest.yaml
+# yaml_path = covid/models/paperclassifier/Davids_interest.yaml
+yaml_path = covid/models/paperclassifier/Davids_interest_meshed.yaml
+
 
 ifeq (,$(shell which conda))
 HAS_CONDA=False
@@ -80,6 +82,10 @@ data: #requirements
 #joining csv files to metadata csv to get publish time
 join_datasets: 
 	$(PYTHON_INTERPRETER) covid/data/join_datasets.py data/raw/$(date_str)/ data/raw/merged_raw_data.csv metadata.csv merged_raw_data.csv
+
+## Using Mesh keyworkds to update the yaml file
+mesh_yaml: #requirements
+	$(PYTHON_INTERPRETER) covid/models/paperclassifier/meshsearch.py covid/models/paperclassifier/Davids_interest.yaml covid/models/paperclassifier/ Davids_interest_meshed.yaml
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_data: #requirements
