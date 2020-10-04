@@ -12,10 +12,11 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = $(shell date +%Y-%m-%d -d "1 days ago")
+date_str = $(shell date +%Y-%m-%d -d "2 days ago")
 
-DATA_URL = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
+DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
+DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/24692486
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
@@ -48,11 +49,20 @@ requirements: test_environment
 save_requirements: 
 	$(PYTHON_INTERPRETER) -m pip freeze > requirements.txt
 
+
+################################# Semantics  scholar topics #################################
+
+sem_scholar_topics: download_data download_forecasting_data data join_datasets mesh_yaml classify_data preproc_dataset make_topics
+
+################################ Semantics  scholar #########################################
+#############################################################################################
+
+
 ## Download datasets
 download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
 	@echo ">>> Downloading data files of $(date_str)"
-	curl -o data/raw/cord-19_$(date_str).tar.gz $(DATA_URL)
+	curl -o data/raw/cord-19_$(date_str).tar.gz $(DATA_URL_Sem_Schol)
 	@echo ">>> Unzipping."
 	tar xvzf data/raw/cord-19_$(date_str).tar.gz -C data/raw
 	@echo ">>> Unzipping. $(date_str) embeddings"
@@ -77,7 +87,7 @@ download_forecasting_data:
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
 data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/$(date_str)/document_parses/pdf_json/ data/raw/$(date_str)/ merged_raw_data.csv ["title","abstract"] False
+	$(PYTHON_INTERPRETER) covid/data/make_dataset.py data/raw/$(date_str)/document_parses/pdf_json/ data/raw/$(date_str)/ merged_raw_data.csv ['title','abstract'] False
 
 #joining csv files to metadata csv to get publish time
 join_datasets: 
@@ -101,7 +111,47 @@ preproc_dataset: #location and affilliations classification
 
 ## Run topic modelling over covid corpus
 make_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path)
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) sem_scholar
+
+#############################################################################################
+#############################################################################################
+
+################################# Dimensions topics #################################
+
+dimensions_topics: download_dimensions
+
+################################ Semantics  scholar #########################################
+#############################################################################################
+
+
+## Download datasets
+download_dimensions:
+	wget -O data/raw/$(date_str)/dimensions.xlsx $(DATA_dimensions)
+
+#making dataset of dimensions publications into csv
+colsA = ["Publication ID","Title","DOI","Abstract","Publication Date","Authors Affiliations","Country of Research organization"] #cols to be renamed
+colsB = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
+sheet_name = Publications
+dimensions_publications_datasets: 
+	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name)_raw_data.csv dimensions.xlsx False $(sheet_name) $(colsA) $(colsB) 
+
+## Classify Datasets to find only covid papers reduces file size by 100 fold
+classify_dimensions_publications_data: #requirements
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/$(date_str)/dims_Publications_raw_data.csv data/paperclassifier/classified_dims_Publications_covid.csv $(yaml_path)
+
+## Preprocess Datasets
+preproc_dimensions_publications_dataset: #location and affilliations classification
+	###### get location for all papers around 2hrs run time
+	# $(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/raw/merged_raw_data.csv data/processed/merged_raw_data.csv 11
+	###### get location for covid papers only
+	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_dims_Publications_covid.csv data/processed/classified_dims_Publications_covid.csv 11
+
+## Run topic modelling over covid corpus
+make_dimensions_publications_topics:
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_Publications_covid
+
+#############################################################################################
+#############################################################################################
 
 
 ## Delete all compiled Python files

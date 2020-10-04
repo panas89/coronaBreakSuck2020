@@ -25,11 +25,14 @@ from gensim.models import Phrases
 #-------------------------- Global Vars/Functions ----------------------------
 
 TOP_DIR = str(Path.cwd())
+LOWER_TOPIC_BOUND = 2 #no less than 2 topics
 
-def range_num_topics(num_papers):
-    upper = max(2, num_papers//10) + 1
-    upper = min(upper, 12)
-    lower = upper//2 
+def range_num_topics(num_papers, lower=None, upper=None):
+    if not upper:
+        upper = max(2, num_papers//10) + 1
+        upper = min(upper, 12)
+    if not lower:
+        lower = upper//2 
     
     return list(range(lower, upper,1))
 
@@ -61,7 +64,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
     print("\n\n2. Starting Training\n")
     # Choose training parameters
     param_grid_mallet = {
-        'num_topics': range_num_topics(NUM_PAPERS),
+        'num_topics': range_num_topics(NUM_PAPERS, lower = LOWER_TOPIC_BOUND),
         'iterations': [1000],
         'random_seed': [100],
         'workers': [1]
@@ -140,16 +143,18 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
 
 @click.command()
 @click.argument('yaml_filepath', type=click.Path())
-def main(yaml_filepath):
+@click.argument('output_filename', type=click.Path())
+def main(yaml_filepath,output_filename):
 
     print("Loading & Cleaning The Data\n")
 
     # Load paperclassified data
-    file_path = TOP_DIR + '/data/processed/classified_merged_covid.csv'
+    file_path = TOP_DIR + '/data/processed/' + output_filename +'.csv'
     df = pd.read_csv(file_path, parse_dates=['publish_time'])
     df = process_pcf_data(df, 
                         bad_phrases=COMMON_PHRASES_REGEX, 
                         bad_tokens=COMMON_WORDS, 
+                        clean_col='abstract',
                         drop_nan_text=True, 
                         from_date='2020-01-01')
 
@@ -184,8 +189,8 @@ def main(yaml_filepath):
         
     print("Bad columns:", bad_cols)
 
-    df.to_csv(TOP_DIR + '/data/topicmodels/pcf_topic_data.csv', index=False)
-    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_topic_data.csv')
+    df.to_csv(TOP_DIR + '/data/topicmodels/pcf_' + output_filename + '_topic_data.csv', index=False)
+    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_' + output_filename + 'topic_data.csv')
 
 
 
