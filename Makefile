@@ -111,16 +111,16 @@ preproc_dataset: #location and affilliations classification
 
 ## Run topic modelling over covid corpus
 make_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) sem_scholar
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_merged_covid sem_scholar_topics
 
 #############################################################################################
 #############################################################################################
 
 ################################# Dimensions topics #################################
 
-dimensions_topics: download_dimensions
+dimensions_topics: download_dimensions dimensions_publications_datasets classify_dimensions_publications_data preproc_dimensions_publications_dataset make_dimensions_publications_topics
 
-################################ Semantics  scholar #########################################
+################################ Dimensions papers  #########################################
 #############################################################################################
 
 
@@ -137,21 +137,51 @@ dimensions_publications_datasets:
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_dimensions_publications_data: #requirements
-	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/$(date_str)/dims_Publications_raw_data.csv data/paperclassifier/classified_dims_Publications_covid.csv $(yaml_path)
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/$(date_str)/dims_$(sheet_name)_raw_data.csv data/paperclassifier/classified_dims_$(sheet_name)_covid.csv $(yaml_path)
 
 ## Preprocess Datasets
 preproc_dimensions_publications_dataset: #location and affilliations classification
 	###### get location for all papers around 2hrs run time
 	# $(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/raw/merged_raw_data.csv data/processed/merged_raw_data.csv 11
 	###### get location for covid papers only
-	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_dims_Publications_covid.csv data/processed/classified_dims_Publications_covid.csv 11
+	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_dims_$(sheet_name)_covid.csv data/processed/classified_dims_$(sheet_name)_covid.csv 11
 
 ## Run topic modelling over covid corpus
 make_dimensions_publications_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_Publications_covid
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name)_covid dims_$(sheet_name)_covid_topics
 
 #############################################################################################
 #############################################################################################
+
+
+#############################################################################################
+#############################################################################################
+
+################################# Dimensions datasets topics #################################
+
+dimensions_datasets_topics: dimensions_datasets classify_dimensions_datasets make_dimensions_datasets_topics
+
+################################ Dimensions papers  #########################################
+#############################################################################################
+
+#making dataset of dimensions publications into csv
+colsA_dat = ['Dataset ID', 'Title',	'Source Linkout', 'Description', 'Publication year', 'Dataset author'] #cols to be renamed
+colsB = ["sha","title","doi","abstract_x","publish_time","affiliations"] #default cols to follow through code 
+sheet_name = Datasets
+dimensions_datasets: 
+	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name)_raw_data.csv dimensions.xlsx False $(sheet_name) $(colsA_dat) $(colsB) 
+
+## Classify Datasets to find only covid papers reduces file size by 100 fold
+classify_dimensions_datasets: #requirements
+	$(PYTHON_INTERPRETER) covid/data/classify_data.py data/raw/$(date_str)/dims_$(sheet_name)_raw_data.csv data/paperclassifier/classified_dims_$(sheet_name)_covid.csv $(yaml_path)
+
+## Run topic modelling over covid corpus
+make_dimensions_datasets_topics:
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name)_covid dims_$(sheet_name)_covid_topics
+
+#############################################################################################
+#############################################################################################
+
 
 
 ## Delete all compiled Python files
