@@ -144,12 +144,12 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
 @click.command()
 @click.argument('yaml_filepath', type=click.Path())
 @click.argument('output_filename', type=click.Path())
-def main(yaml_filepath,output_filename):
+def main(yaml_filepath, input_filename, output_filename):
 
     print("Loading & Cleaning The Data\n")
 
     # Load paperclassified data
-    file_path = TOP_DIR + '/data/processed/' + output_filename +'.csv'
+    file_path = TOP_DIR + '/data/processed/' + input_filename +'.csv'
     df = pd.read_csv(file_path, parse_dates=['publish_time'])
     df = process_pcf_data(df, 
                         bad_phrases=COMMON_PHRASES_REGEX, 
