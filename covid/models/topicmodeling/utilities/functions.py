@@ -79,9 +79,11 @@ def process_pcf_data(df, bad_phrases, bad_tokens, clean_col, drop_nan_text=False
     df = df[df.publish_time >= from_date]
     
     # Treat NaNs
-    if drop_nan_text:
-        df.dropna(subset=['text'], axis=0, inplace=True)
-    df.loc[:,['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
+    # if drop_nan_text:
+    #     df.dropna(subset=['text'], axis=0, inplace=True)
+    # df.loc[:,['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
+
+    df.loc[:,['title', 'abstract']] = df[['title', 'abstract']].fillna('')
     
     # Create meta col
     df.loc[:,'abstract'] = df.loc[:,'abstract'].apply(lambda x: x[len('abstract'):] 

@@ -12,7 +12,8 @@ from covid.models.paperclassifier.paperclassifier import PaperClassifier
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
 @click.argument('yaml_filepath', type=click.Path())
-def main(input_filepath, output_filepath,yaml_filepath):
+@click.argument('use_cols', type=click.Path())
+def main(input_filepath, output_filepath,yaml_filepath,use_cols):
     """ Runs data processing scripts to turn raw merged data from (../raw) into
         cleaned covid papers ready to be analyzed (saved in ../processed).
     """
@@ -20,7 +21,7 @@ def main(input_filepath, output_filepath,yaml_filepath):
     logger.info('reading data')
     print(input_filepath)
 
-    USE_COLS = ['sha', 'title', 'abstract_x','affiliations', 'location', 'publish_time','doi']#,'text'
+    USE_COLS = use_cols.replace('[','').replace(']','').split(',')
     df = pd.read_csv(input_filepath, usecols=USE_COLS)\
         .rename({'abstract_x': 'abstract'}, axis=1)
     NUM_PAPERS = len(df) 

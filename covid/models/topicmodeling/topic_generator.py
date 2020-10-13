@@ -36,7 +36,7 @@ def range_num_topics(num_papers, lower=None, upper=None):
     
     return list(range(lower, upper,1))
 
-def learn_topics(df, class_col, train_on_col='clean_text'):
+def learn_topics(df, class_col, output_filename, train_on_col='clean_text'):
 
     # 1. Prepare Text Data
     #######################
@@ -119,7 +119,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
     # 4. Save Data 
     ################
 
-    SAVE_DIR = TOP_DIR + f'/data/topicmodels/{class_col}/' 
+    SAVE_DIR = TOP_DIR + f'/data/topicmodels/{output_filename}' + f'/{class_col}/' 
     if not os.path.exists(SAVE_DIR):
         os.mkdir(SAVE_DIR)
 
@@ -143,6 +143,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
 
 @click.command()
 @click.argument('yaml_filepath', type=click.Path())
+@click.argument('input_filename', type=click.Path())
 @click.argument('output_filename', type=click.Path())
 def main(yaml_filepath, input_filename, output_filename):
 
@@ -175,7 +176,7 @@ def main(yaml_filepath, input_filename, output_filename):
     for class_col in CLASSES+SUBCLASSES:
         try:
             # Learn topics for papers with class_col tag
-            df_topics = learn_topics(df, class_col, train_on_col='clean_abstract')
+            df_topics = learn_topics(df, class_col, output_filename, train_on_col='clean_abstract')
 
             # Append topic-tags/topic-keywords cols to df
             df = df.join(df_topics)
@@ -189,7 +190,9 @@ def main(yaml_filepath, input_filename, output_filename):
         
     print("Bad columns:", bad_cols)
 
-    df.to_csv(TOP_DIR + '/data/topicmodels/pcf_' + output_filename + '_topic_data.csv', index=False)
+    if not os.path.exists(TOP_DIR + f'/data/topicmodels/{output_filename}/'):
+        os.mkdir(TOP_DIR + f'/data/topicmodels/{output_filename}/')
+    df.to_csv(TOP_DIR + f'/data/topicmodels/{output_filename}/pcf_' + output_filename + '_topic_data.csv', index=False)
     print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_' + output_filename + 'topic_data.csv')
 
 
