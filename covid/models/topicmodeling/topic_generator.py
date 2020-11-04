@@ -171,6 +171,10 @@ def main(yaml_filepath, input_filename, output_filename):
         subclasses_of_c = list(yaml_dict[c].keys())
         SUBCLASSES.extend(subclasses_of_c)
 
+    #creating main folder
+    if not os.path.exists(TOP_DIR + f'/data/topicmodels/{output_filename}/'):
+        os.mkdir(TOP_DIR + f'/data/topicmodels/{output_filename}/')
+
     # Learn topics for each class/subclass
     bad_cols = []
     for class_col in CLASSES+SUBCLASSES:
@@ -185,15 +189,15 @@ def main(yaml_filepath, input_filename, output_filename):
             df.rename({'dominant_topic': class_col + '_topic',
                     'topic_keywords': class_col + '_topic_kw'
                     }, axis=1, inplace=True)
-        except:
+        except Exception as e:
+            print(e)
+            break
             bad_cols.append(class_col)
         
     print("Bad columns:", bad_cols)
 
-    if not os.path.exists(TOP_DIR + f'/data/topicmodels/{output_filename}/'):
-        os.mkdir(TOP_DIR + f'/data/topicmodels/{output_filename}/')
     df.to_csv(TOP_DIR + f'/data/topicmodels/{output_filename}/pcf_' + output_filename + '_topic_data.csv', index=False)
-    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_' + output_filename + 'topic_data.csv')
+    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/' + output_filename + '/pcf_' + output_filename + '_topic_data.csv')
 
 
 
