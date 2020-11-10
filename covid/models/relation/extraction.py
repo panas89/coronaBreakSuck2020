@@ -1,4 +1,5 @@
-from tqdm import tqdm_notebook as tqdm
+#from tqdm import tqdm_notebook as tqdm
+from tqdm import tqdm as tqdm
 import opennre
 import spacy
 import yaml
