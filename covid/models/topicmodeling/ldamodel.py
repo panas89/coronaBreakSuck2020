@@ -17,6 +17,7 @@ from gensim.models.ldamulticore import LdaMulticore
 from gensim.models.ldamodel import LdaModel
 from gensim.models.wrappers import LdaMallet
 from gensim.models.wrappers.ldamallet import malletmodel2ldamodel
+from gensim.matutils import corpus2dense, corpus2csc
 
 # Visualization
 import pyLDAvis.gensim
@@ -24,6 +25,9 @@ import pyLDAvis.gensim
 # Sklearn
 from sklearn.model_selection import ParameterGrid
 from sklearn.metrics import f1_score
+from sklearn.decomposition import PCA,IncrementalPCA,SparsePCA,TruncatedSVD
+from sklearn.mixture import GaussianMixture
+
 
 # **Note**: LdaModel trasforms docs and tokens to the (num_topics)-dimensional latent space of topics
 # LdaModel[corpus][i][0] = list((topic_no, probability))
@@ -73,6 +77,54 @@ class LDAModel:
         self.corpus = tfidf[self.corpus]
 
         return self
+
+    def getLowerTopicBound(self):
+        """
+        Method that computes the lower bound of topics using, tfidf then PCA, and mixture of gaussian with BIC to estimate optimal number of gaussians (i.e., topics).
+
+        Output:
+          - Integer: lower bound number of topics.
+
+        """
+        # Initialize gensim's TF-IDF
+        tfidf = TfidfModel(self.corpus, self.id2word)
+        num_docs = self.id2word.num_docs
+        num_terms = len(self.id2word.keys())
+        
+        # batch_size = 10000
+
+        # pca = IncrementalPCA(n_components=200,batch_size=250)
+        # for i in tqdm(range(0,len(self.corpus),batch_size)):
+        #     corpus_tfidf = tfidf[self.corpus[i:i+batch_size]]
+
+        #     #to numpy array
+        #     corpus_tfidf_dense = corpus2dense(corpus_tfidf, num_terms, len(corpus_tfidf))[:,:1000].T
+            
+        #     #PCA decomposition
+        #     pca.partial_fit(corpus_tfidf_dense)
+
+        #     if i==0:
+        #         corpus_pca = pca.transform(corpus_tfidf_dense)
+        #     else:
+        #         corpus_pca = np.vstack((corpus_pca,pca.transform(corpus_tfidf_dense)))
+
+        pca = TruncatedSVD(n_components=100)
+        corpus_tfidf = tfidf[self.corpus]
+        corpus_sparse = corpus2csc(corpus=corpus_tfidf, num_terms=num_terms, num_docs=len(corpus_tfidf))
+        pca.fit(corpus_sparse)
+        corpus_pca = pca.transform(corpus_sparse)
+
+        #Mixture of Gaussians and BIC
+        gm = GaussianMixture(n_components=1,covariance_type='diag')
+
+        print('Finding the lower bound of optimal number of topics ...')
+
+        bics = [GaussianMixture(n_components=num_comp,covariance_type='diag').fit(corpus_pca).bic(corpus_pca) for num_comp in tqdm(range(2,12))]
+
+        print('Lower bound: ', np.argmin(bics) + 2)
+
+        return np.argmin(bics) + 2 #counting at 2 + 1 for the index to get number of components
+
 
     def filter_low_tfidf(self, text_data, min_tfidf_score=0.01, keep_fraction=None):
         """

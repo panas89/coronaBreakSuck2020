@@ -26,6 +26,7 @@ from gensim.models import Phrases
 
 TOP_DIR = str(Path.cwd())
 LOWER_TOPIC_BOUND = 2 #no less than 2 topics
+UPPER_TOPIC_BOUND = 12 #no more than 12 topics
 
 def range_num_topics(num_papers, lower=None, upper=None):
     if not upper:
@@ -60,6 +61,14 @@ def learn_topics(df, class_col, output_filename, train_on_col='clean_text'):
 
     # 2. Train LDA Models 
     #######################
+
+    ###########setting Lower_topic_bound and upper_topic_bound
+
+    # initialize LDA model
+    temp_lda = LDAModel(text_data, test_data=None)
+
+    LOWER_TOPIC_BOUND = temp_lda.getLowerTopicBound()
+    UPPER_TOPIC_BOUND = LOWER_TOPIC_BOUND + 2 #use small range to speed up parameter tuning
 
     print("\n\n2. Starting Training\n")
     # Choose training parameters
@@ -179,9 +188,10 @@ def main(yaml_filepath, input_filename, output_filename):
     bad_cols = []
     for class_col in CLASSES+SUBCLASSES:
         try:
+            print('hi')
             # Learn topics for papers with class_col tag
             df_topics = learn_topics(df, class_col, output_filename, train_on_col='clean_abstract')
-
+            print('hi')
             # Append topic-tags/topic-keywords cols to df
             df = df.join(df_topics)
             df.loc[:,'dominant_topic'] = df['dominant_topic'].fillna(-1).astype('int')
@@ -190,8 +200,9 @@ def main(yaml_filepath, input_filename, output_filename):
                     'topic_keywords': class_col + '_topic_kw'
                     }, axis=1, inplace=True)
         except Exception as e:
+            print('hi')
             print(e)
-            break
+            # break
             bad_cols.append(class_col)
         
     print("Bad columns:", bad_cols)
