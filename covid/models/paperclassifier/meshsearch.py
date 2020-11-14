@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+import click
+import logging
+from pathlib import Path
+from dotenv import find_dotenv, load_dotenv
+
 import yaml
 import pickle
 import xml.etree.ElementTree as et
@@ -88,12 +94,21 @@ def mesh_extension(mesh_obj, yaml_path) -> dict:
 
 # ####################################################################################################
 
-if __name__ == '__main__':
+@click.command()
+@click.argument('input_filepath', type=click.Path(exists=True))
+@click.argument('output_filepath', type=click.Path())
+@click.argument('filename', type=click.Path())
+def main(input_filepath, output_filepath, filename):
+    """ Runs data processing scripts to turn raw data from (../raw) into
+        cleaned data ready to be analyzed (saved in ../processed).
+    """
+    logger = logging.getLogger(__name__)
+    logger.info('creating meshed yaml')
 
     # Define file paths
-    id2kws_path = 'mesh_id2keywords.pkl'
-    kw2id_path = 'mesh_kw2id.pkl'
-    yaml_path = './interest.yaml'
+    id2kws_path = 'covid/models/paperclassifier/mesh_id2keywords.pkl'
+    kw2id_path = 'covid/models/paperclassifier/mesh_kw2id.pkl'
+    yaml_path = input_filepath
 
     # Instantiate MeshSearch object
     mesh_obj = MeshSearch(id2kws_path=id2kws_path, kw2id_path=kw2id_path)
@@ -101,6 +116,23 @@ if __name__ == '__main__':
     # Create mesh extension of kws in yaml
     yml_dict = mesh_extension(mesh_obj, yaml_path)
 
+    logger.info('saving ' + filename)
     # Save mesh-extended dict as yaml
-    with open('./mesh_interest.yml', 'w') as outfile:
+    with open(output_filepath + filename, 'w') as outfile:
         yaml.dump(yml_dict, outfile, default_flow_style=True)
+
+    
+
+
+if __name__ == '__main__':
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=log_fmt)
+
+    # not used in this stub but often useful for finding various files
+    project_dir = Path(__file__).resolve().parents[2]
+
+    # find .env automagically by walking up directories until it's found, then
+    # load up the .env entries as environment variables
+    load_dotenv(find_dotenv())
+
+    main()
