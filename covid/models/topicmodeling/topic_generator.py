@@ -25,15 +25,19 @@ from gensim.models import Phrases
 #-------------------------- Global Vars/Functions ----------------------------
 
 TOP_DIR = str(Path.cwd())
+LOWER_TOPIC_BOUND = 2 #no less than 2 topics
+UPPER_TOPIC_BOUND = 12 #no more than 12 topics
 
-def range_num_topics(num_papers):
-    upper = max(2, num_papers//10) + 1
-    upper = min(upper, 12)
-    lower = upper//2 
+def range_num_topics(num_papers, lower=None, upper=None):
+    if not upper:
+        upper = max(2, num_papers//10) + 1
+        upper = min(upper, 12)
+    if not lower:
+        lower = upper//2 
     
     return list(range(lower, upper,1))
 
-def learn_topics(df, class_col, train_on_col='clean_text'):
+def learn_topics(df, class_col, output_filename, train_on_col='clean_text'):
 
     # 1. Prepare Text Data
     #######################
@@ -58,10 +62,18 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
     # 2. Train LDA Models 
     #######################
 
+    ###########setting Lower_topic_bound and upper_topic_bound
+
+    # initialize LDA model
+    temp_lda = LDAModel(text_data, test_data=None)
+
+    LOWER_TOPIC_BOUND = temp_lda.getLowerTopicBound()
+    UPPER_TOPIC_BOUND = LOWER_TOPIC_BOUND + 2 #use small range to speed up parameter tuning
+
     print("\n\n2. Starting Training\n")
     # Choose training parameters
     param_grid_mallet = {
-        'num_topics': range_num_topics(NUM_PAPERS),
+        'num_topics': range_num_topics(NUM_PAPERS, lower = LOWER_TOPIC_BOUND),
         'iterations': [1000],
         'random_seed': [100],
         'workers': [1]
@@ -116,7 +128,7 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
     # 4. Save Data 
     ################
 
-    SAVE_DIR = TOP_DIR + f'/data/topicmodels/{class_col}/' 
+    SAVE_DIR = TOP_DIR + f'/data/topicmodels/{output_filename}' + f'/{class_col}/' 
     if not os.path.exists(SAVE_DIR):
         os.mkdir(SAVE_DIR)
 
@@ -140,16 +152,19 @@ def learn_topics(df, class_col, train_on_col='clean_text'):
 
 @click.command()
 @click.argument('yaml_filepath', type=click.Path())
-def main(yaml_filepath):
+@click.argument('input_filename', type=click.Path())
+@click.argument('output_filename', type=click.Path())
+def main(yaml_filepath, input_filename, output_filename):
 
     print("Loading & Cleaning The Data\n")
 
     # Load paperclassified data
-    file_path = TOP_DIR + '/data/processed/classified_merged_covid.csv'
+    file_path = TOP_DIR + '/data/processed/' + input_filename +'.csv'
     df = pd.read_csv(file_path, parse_dates=['publish_time'])
     df = process_pcf_data(df, 
                         bad_phrases=COMMON_PHRASES_REGEX, 
                         bad_tokens=COMMON_WORDS, 
+                        clean_col='abstract',
                         drop_nan_text=True, 
                         from_date='2020-01-01')
 
@@ -165,13 +180,16 @@ def main(yaml_filepath):
         subclasses_of_c = list(yaml_dict[c].keys())
         SUBCLASSES.extend(subclasses_of_c)
 
+    #creating main folder
+    if not os.path.exists(TOP_DIR + f'/data/topicmodels/{output_filename}/'):
+        os.mkdir(TOP_DIR + f'/data/topicmodels/{output_filename}/')
+
     # Learn topics for each class/subclass
     bad_cols = []
     for class_col in CLASSES+SUBCLASSES:
         try:
             # Learn topics for papers with class_col tag
-            df_topics = learn_topics(df, class_col, train_on_col='clean_abstract')
-
+            df_topics = learn_topics(df, class_col, output_filename, train_on_col='clean_abstract')
             # Append topic-tags/topic-keywords cols to df
             df = df.join(df_topics)
             df.loc[:,'dominant_topic'] = df['dominant_topic'].fillna(-1).astype('int')
@@ -179,13 +197,15 @@ def main(yaml_filepath):
             df.rename({'dominant_topic': class_col + '_topic',
                     'topic_keywords': class_col + '_topic_kw'
                     }, axis=1, inplace=True)
-        except:
+        except Exception as e:
+            print(e)
+            # break
             bad_cols.append(class_col)
         
     print("Bad columns:", bad_cols)
 
-    df.to_csv(TOP_DIR + '/data/topicmodels/pcf_topic_data.csv', index=False)
-    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/pcf_topic_data.csv')
+    df.to_csv(TOP_DIR + f'/data/topicmodels/{output_filename}/pcf_' + output_filename + '_topic_data.csv', index=False)
+    print('\n\nPath of Final Classified DF\n' + '-'*27 + '\n\n' + TOP_DIR + '/data/topicmodels/' + output_filename + '/pcf_' + output_filename + '_topic_data.csv')
 
 
 
