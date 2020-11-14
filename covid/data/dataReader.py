@@ -195,13 +195,26 @@ def getPattern(x,pattern):
 def getCSVPapers(filenames,relative_path):
 
     files = []
+    frames = []
+
+    print('Reading ' + str(len(filenames)) + ' json files in batches of 10000!')
 
     for i in range(len(filenames)):
         file = json.load(open(path_all_archives+relative_path+ filenames[i]))
         
+        #read in batches
+        if i%10000==0:
+            df_samp = generate_clean_df(files)
+            frames.append(df_samp)
+            files = []
+        elif i > len(filenames)-1: #last batch
+            df_samp = generate_clean_df(files)
+            frames.append(df_samp)
+            files = []
+
         files.append(file)
 
-    df = generate_clean_df(files)
+    df = pd.concat(frames,axis=0)
 
     tqdm.pandas()
 
