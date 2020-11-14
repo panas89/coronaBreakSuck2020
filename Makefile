@@ -12,7 +12,7 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = 2020-11-01#$(shell date +%Y-%m-%d -d "2 days ago")
+date_str = $(shell date +%Y-%m-%d -d "2 days ago")
 
 DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
@@ -147,9 +147,23 @@ preproc_dimensions_publications_dataset: #location and affilliations classificat
 	###### get location for covid papers only
 	$(PYTHON_INTERPRETER) covid/data/preproc_dataset.py data/paperclassifier/classified_dims_$(sheet_name_pub)_covid.csv data/processed/classified_dims_$(sheet_name_pub)_covid.csv 11
 
+## Filtering top 5% high impact papers
+lb_95 = 0.95
+ub_100 = 1.00
+top_5_perc_altmetric_papers: 
+	$(PYTHON_INTERPRETER) covid/data/make_quantile_dimentions_papers.py data/raw/$(date_str)/ data/processed/classified_dims_$(sheet_name_pub)_hi_95_100_covid.csv dimensions.xlsx data/processed/classified_dims_$(sheet_name_pub)_covid.csv $(sheet_name_pub) $(lb_95) $(ub_100) 
+
+## Filtering top 5% high impact papers
+lb_90 = 0.90
+ub_95 = 0.9499
+top_5_10_perc_altmetric_papers: 
+	$(PYTHON_INTERPRETER) covid/data/make_quantile_dimentions_papers.py data/raw/$(date_str)/ data/processed/classified_dims_$(sheet_name_pub)_hi_90_95_covid.csv dimensions.xlsx data/processed/classified_dims_$(sheet_name_pub)_covid.csv $(sheet_name_pub) $(lb_90) $(ub_95) 
+
 ## Run topic modelling over covid corpus
 make_dimensions_publications_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_covid dims_$(sheet_name_pub)_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_95_100_covid dims_$(sheet_name_pub)_hi_95_100_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_95_100_covid dims_$(sheet_name_pub)_hi_90_95_covid_topics
+
 
 #############################################################################################
 #############################################################################################
