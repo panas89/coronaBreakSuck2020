@@ -188,10 +188,8 @@ def main(yaml_filepath, input_filename, output_filename):
     bad_cols = []
     for class_col in CLASSES+SUBCLASSES:
         try:
-            print('hi')
             # Learn topics for papers with class_col tag
             df_topics = learn_topics(df, class_col, output_filename, train_on_col='clean_abstract')
-            print('hi')
             # Append topic-tags/topic-keywords cols to df
             df = df.join(df_topics)
             df.loc[:,'dominant_topic'] = df['dominant_topic'].fillna(-1).astype('int')
@@ -200,7 +198,6 @@ def main(yaml_filepath, input_filename, output_filename):
                     'topic_keywords': class_col + '_topic_kw'
                     }, axis=1, inplace=True)
         except Exception as e:
-            print('hi')
             print(e)
             # break
             bad_cols.append(class_col)
