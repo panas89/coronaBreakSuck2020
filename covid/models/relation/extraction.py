@@ -122,8 +122,13 @@ class RelationExtractor(object):
         closest_dist = 99999999
         
         for bn in bns:
-            dist = abs(abstract.index(bn) - abstract.index(kw))
-            if dist < closest_dist:
-                bn_closest = bn
-                closest_dist = dist
+            try:
+                dist = abs(abstract.index(bn) - abstract.index(kw))
+                if dist < closest_dist:
+                    bn_closest = bn
+                    closest_dist = dist
+            except Exception as e:
+                print(e)
+                print(abstract,bn,kw)
+                break;
         return bn_closest

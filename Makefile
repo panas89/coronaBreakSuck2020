@@ -162,7 +162,7 @@ top_5_10_perc_altmetric_papers:
 ## Run topic modelling over covid corpus
 make_dimensions_publications_topics:
 	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_95_100_covid dims_$(sheet_name_pub)_hi_95_100_covid_topics
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_95_100_covid dims_$(sheet_name_pub)_hi_90_95_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_90_95_covid dims_$(sheet_name_pub)_hi_90_95_covid_topics
 
 
 #############################################################################################
@@ -247,6 +247,33 @@ make_dimensions_grants_topics:
 
 #############################################################################################
 #############################################################################################
+
+
+#############################################################################################
+#############################################################################################
+
+################################# Relationship extraction   #################################
+
+re_run_all_sources: re_sem_scholar re_dims_pub re_dims_clin_trials
+
+################################ Semantic scholar relationships #############################
+
+re_sem_scholar:
+	$(PYTHON_INTERPRETER) scripts/script_relation_extraction.py data/processed/classified_merged_covid.csv data/paperclassifier/classified_sem_scholar_covid_relation.csv $(yaml_path)
+
+#############################################################################################
+################################ Dims Publications 5, and 5_10 perc relationships ###########
+
+re_dims_pub:
+	$(PYTHON_INTERPRETER) scripts/script_relation_extraction.py data/processed/classified_dims_$(sheet_name_pub)_hi_95_100_covid.csv data/paperclassifier/classified_dims_$(sheet_name_pub)_hi_95_100_covid_relation.csv $(yaml_path)
+	$(PYTHON_INTERPRETER) scripts/script_relation_extraction.py data/processed/classified_dims_$(sheet_name_pub)_hi_90_95_covid.csv data/paperclassifier/classified_dims_$(sheet_name_pub)_hi_90_95_covid_relation.csv $(yaml_path)
+
+
+#############################################################################################
+################################ Dims Clinical trials relationships #########################
+
+re_dims_clin_trials:
+	$(PYTHON_INTERPRETER) scripts/script_relation_extraction.py data/processed/classified_dims_$(sheet_name_clin_trials)_covid.csv data/paperclassifier/classified_dims_$(sheet_name_clin_trials)_covid_relation.csv $(yaml_path)
 
 
 ## Delete all compiled Python files
