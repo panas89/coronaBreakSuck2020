@@ -29,19 +29,29 @@ class DataProcessor:
         """Read raw data into DataProcessor."""
         self.df = pd.read_csv(raw_data_path+self.filename)
 
+    def read_xlsx_data(self, raw_data_path, sheet_name):
+        """Read raw data into DataProcessor."""
+        self.df = pd.read_excel(raw_data_path+self.filename,sheet_name=sheet_name)
+
+    def rename_colunms(self, colsA, colsB):
+        """Rename dataframe columns."""
+        self.df.rename({colA: colB for colA,colB in zip(colsA,colsB)
+                        }, axis=1, inplace=True)
+
     def process_data(self):
         """Process raw data into useful files for model."""
         self.df_preproc = nltkPreProcDf(self.df,self.cols_to_preproc)
 
-    def process_dates(self):
+    def process_dates(self,col='publish_time'):
         """Normalize dates"""
         self.df_preproc = datetimeCleanerPipe(self.df, 
-                                              col='publish_time', 
+                                              col=col, 
                                               normalize_future=True)
 
-    def write_data(self, df, processed_data_path):
+    def write_data(self, df, processed_data_path,without_filename=False):
         """Write processed data to directory."""
-        
-        df.to_csv(processed_data_path+self.filename,
-                    index=False)
+        if without_filename:
+            df.to_csv(processed_data_path, index=False)
+        else:
+            df.to_csv(processed_data_path+self.filename, index=False)
 
