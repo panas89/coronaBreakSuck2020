@@ -71,7 +71,7 @@ def load_paper_data(file_path, class_cols, bad_phrases, bad_tokens, drop_nan_tex
 #------------------------ DataFrame Methods -------------------------
 
 
-def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date='2020-01-01'):
+def process_pcf_data(df, bad_phrases, bad_tokens, clean_col, drop_nan_text=False, from_date='2020-01-01'):
     
     NUM_PAPERS = len(df)
     
@@ -79,9 +79,11 @@ def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date
     df = df[df.publish_time >= from_date]
     
     # Treat NaNs
-    if drop_nan_text:
-        df.dropna(subset=['text'], axis=0, inplace=True)
-    df.loc[:,['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
+    # if drop_nan_text:
+    #     df.dropna(subset=['text'], axis=0, inplace=True)
+    # df.loc[:,['title', 'abstract', 'text']] = df[['title', 'abstract', 'text']].fillna('')
+
+    df.loc[:,['title', 'abstract']] = df[['title', 'abstract']].fillna('')
     
     # Create meta col
     df.loc[:,'abstract'] = df.loc[:,'abstract'].apply(lambda x: x[len('abstract'):] 
@@ -99,10 +101,7 @@ def process_pcf_data(df, bad_phrases, bad_tokens, drop_nan_text=False, from_date
                            replace_num=False,
                            replace_contr=False)
 
-    df.loc[:,'clean_title'] = df['title'].apply(lambda x: text_cleaner(x))
-    df.loc[:,'clean_abstract'] = df['abstract'].apply(lambda x: text_cleaner(x))
-    df.loc[:,'clean_text'] = df['text'].apply(lambda x: text_cleaner(x))
-    df.loc[:,'clean_meta'] = df['meta'].apply(lambda x: text_cleaner(x))
+    df.loc[:,'clean_' + clean_col] = df[clean_col].apply(lambda x: text_cleaner(x))
 
     print('Fraction of selected papers: {}/{}'.format(len(df), NUM_PAPERS))
     
