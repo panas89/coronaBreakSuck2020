@@ -108,8 +108,9 @@ class RelationExtractor(object):
                 
                 # extraction the relation
                 # There are couple of relations that are interesting
-                relation = self.extract(abstract, bn_closest, kw)
-                relation_this.append(relation)
+                if bn_closest is not None:
+                    relation = self.extract(abstract, bn_closest, kw)
+                    relation_this.append(relation)
             relations.append(relation_this)
         return relations
 
@@ -118,6 +119,10 @@ class RelationExtractor(object):
         """
         Get the closest covid base name with respect to keyword.
         """
+        if kw not in abstract:
+            return None
+
+        # start
         bn_closest = bns[0]
         closest_dist = 99999999
         
@@ -129,6 +134,5 @@ class RelationExtractor(object):
                     closest_dist = dist
             except Exception as e:
                 print(e)
-                print(abstract,bn,kw)
-                break;
+                continue
         return bn_closest
