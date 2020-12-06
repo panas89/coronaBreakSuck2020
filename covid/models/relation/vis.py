@@ -49,6 +49,8 @@ def preprocess_df(df_r):
 
             # create content string
             for c in rx:
+                if c is None:
+                    continue
                 if c[2][0] in accept_relations.keys():
                     content = [c[1], accept_relations[c[2][0]], c[2][1], 
                                sha, title, publish_time, location]
