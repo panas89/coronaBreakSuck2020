@@ -1,3 +1,16 @@
+# 12/23/20 Improvement plan 
+1.	(Johnny) Write the descriptions for the NRE graphs and send them over to Vasilis
+2.  (Later) For the 1st overview NRE distribution graph, it contains too much information
+    - Suggestion 1: Aggregate data points into a monthly scale instead of day scale
+    - Suggestion 2: shall we show top-3 strongest or top-3 weakest keywords only 
+    - Ask David opinion
+3.	(Panayiotis) Check the Mesh file; solve the grouping issues
+4.	(Vasilis) Miscellaneous clean-up:
+    - Styling the app & add datasets
+    - Polish graphs: remove “publish time”, make y-axis and x-axis consistent, revise the title. For the 3rd plot, show only the top-5 keywords
+    - (optional) Change the way we selected the keywords for second NRE plot
+
+
 # 08/20/20 Improvement plan
 Johnny: 
 1. Implement the end-to-end script to extract all the relations from an excel sheet. (Done?)
