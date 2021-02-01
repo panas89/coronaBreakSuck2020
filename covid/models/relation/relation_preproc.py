@@ -13,7 +13,9 @@ import glob
 if __name__ == "__main__":
     path = "data/paperclassifier/"
     filenames = [
-        filename.replace(path, "") for filename in glob.glob(path + "/*relation.csv")
+        filename.replace(path, "")
+        for filename in glob.glob(path + "/*relation.csv")
+        if "pre_proc" not in filename
     ]
 
     for filename in filenames:

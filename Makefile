@@ -12,11 +12,11 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = 2020-12-20#$(shell date +%Y-%m-%d -d "2 days ago")
+date_str = 2021-01-31#$(shell date +%Y-%m-%d -d "2 days ago")
 
 DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
-DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/25662737
+DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/25957832
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
@@ -56,7 +56,6 @@ sem_scholar_topics: download_data download_forecasting_data data join_datasets m
 
 ################################ Semantics  scholar #########################################
 #############################################################################################
-
 
 ## Download datasets
 download_data:
@@ -120,7 +119,7 @@ make_topics:
 
 ################################# Dimensions topics #################################
 
-dimensions_publications_topics: download_dimensions dimensions_publications_datasets classify_dimensions_publications_data preproc_dimensions_publications_dataset make_dimensions_publications_topics
+dimensions_publications_topics: download_dimensions dimensions_publications_datasets classify_dimensions_publications_data preproc_dimensions_publications_dataset top_5_perc_altmetric_papers top_5_10_perc_altmetric_papers make_dimensions_publications_topics
 
 ################################ Dimensions papers  #########################################
 #############################################################################################
@@ -173,7 +172,7 @@ make_dimensions_publications_topics:
 #############################################################################################
 #############################################################################################
 
-################################# Dimensions datasets topics #################################
+################################# Dimensions datasets topics ################################
 
 dimensions_datasets_topics: dimensions_datasets classify_dimensions_datasets make_dimensions_datasets_topics
 
@@ -276,11 +275,23 @@ re_dims_pub:
 re_dims_clin_trials:
 	$(PYTHON_INTERPRETER) scripts/script_relation_extraction.py data/processed/classified_dims_$(sheet_name_clin_trials)_covid.csv data/paperclassifier/classified_dims_$(sheet_name_clin_trials)_covid_relation.csv $(yaml_path)
 
+#############################################################################################
+################################ pre-processing re relations to common keyword ##############
+
+re_pre_proc:
+	$(PYTHON_INTERPRETER) covid/models/relation/relation_preproc.py
 
 #############################################################################################
+
+
+################################# Dash data requirements ####################################
+
+finalize_data: dash_file_structure final_data_pre_proc_location
+
 ################################ creating final folder with dash files ######################
 
-final_data:
+dash_file_structure:
+	######## forecasting data
 	@echo ">>> creating covid folder"
 	mkdir -p data/dashDatasets/covid/
 	@echo ">>> Moving data confirmed cases USA"
@@ -293,11 +304,50 @@ final_data:
 	cp data/raw/$(date_str)/death_global.csv data/dashDatasets/covid/
 	@echo ">>> Moving data recovered cases global"
 	cp data/raw/$(date_str)/recovered_global.csv data/dashDatasets/covid/
+	######## nre data
+	@echo ">>> creating nre folder"
+	mkdir -p data/dashDatasets/nre/
+	@echo ">>> Moving NRE Clinical trials"
+	cp data/paperclassifier/pre_proc_classified_dims_Clinical\ Trials_covid_relation.csv data/dashDatasets/nre/
+	mv data/dashDatasets/nre/pre_proc_classified_dims_Clinical\ Trials_covid_relation.csv data/dashDatasets/nre/Clinical_Trials.csv
+	@echo ">>> Moving NRE Publications 90-95% importance"
+	cp data/paperclassifier/pre_proc_classified_dims_Publications_hi_90_95_covid_relation.csv data/dashDatasets/nre/
+	mv data/dashDatasets/nre/pre_proc_classified_dims_Publications_hi_90_95_covid_relation.csv data/dashDatasets/nre/Publications_hi_90_95.csv
+	@echo ">>> Moving NRE Publications 95-100% importance"
+	cp data/paperclassifier/pre_proc_classified_dims_Publications_hi_95_100_covid_relation.csv data/dashDatasets/nre/
+	mv data/dashDatasets/nre/pre_proc_classified_dims_Publications_hi_95_100_covid_relation.csv data/dashDatasets/nre/Publications_hi_95_100.csv
+	@echo ">>> Moving NRE Publications from semantic_scholar"
+	cp data/paperclassifier/pre_proc_classified_sem_scholar_covid_relation.csv data/dashDatasets/nre/
+	mv data/dashDatasets/nre/pre_proc_classified_sem_scholar_covid_relation.csv data/dashDatasets/nre/semantic_scholar.csv
+	######## topic modelling data
+	@echo ">>> creating nre folder"
+	mkdir -p data/dashDatasets/topicmodelling/
+	@echo ">>> Moving topic modelling Clinical trials"
+	cp data/topicmodels/dims_Clinical\ Trials_covid_topics/pcf_dims_Clinical\ Trials_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
+	mv data/dashDatasets/topicmodelling/pcf_dims_Clinical\ Trials_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Clinical_Trials.csv
+	@echo ">>> Moving topic modelling Publications 90-95% importance"
+	cp data/topicmodels/dims_Publications_hi_90_95_covid_topics/pcf_dims_Publications_hi_90_95_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
+	mv data/dashDatasets/topicmodelling/pcf_dims_Publications_hi_90_95_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Publications_hi_90_95.csv
+	@echo ">>> Moving topic modelling Publications 95-100% importance"
+	cp data/topicmodels/dims_Publications_hi_95_100_covid_topics/pcf_dims_Publications_hi_95_100_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
+	mv data/dashDatasets/topicmodelling/pcf_dims_Publications_hi_95_100_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Publications_hi_95_100.csv
+	@echo ">>> Moving topic modelling Publications from semantic_scholar"
+	cp data/topicmodels/sem_scholar_covid_topics/pcf_sem_scholar_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
+	mv data/dashDatasets/topicmodelling/pcf_sem_scholar_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/semantic_scholar.csv
+	@echo ">>> Moving topic modelling Grants"
+	cp data/topicmodels/dims_Grants_covid_topics/pcf_dims_Grants_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
+	mv data/dashDatasets/topicmodelling/pcf_dims_Grants_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Grants.csv
 
 
 
-semantics_scholar_topics: data join_datasets mesh_yaml classify_data preproc_dataset make_topics
+#############################################################################################
+################################ preprocess location of dash files ##########################
 
+final_data_pre_proc_location:
+	$(PYTHON_INTERPRETER) covid/data/final_data_pre_proc_location.py
+
+#############################################################################################
+#############################################################################################
 
 
 ## Delete all compiled Python files
