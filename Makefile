@@ -12,11 +12,11 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = $(shell date +%Y-%m-%d -d "2 days ago")
+date_str = 2020-12-20#$(shell date +%Y-%m-%d -d "2 days ago")
 
 DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
-DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/25111877
+DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/25662737
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
@@ -60,7 +60,7 @@ sem_scholar_topics: download_data download_forecasting_data data join_datasets m
 
 ## Download datasets
 download_data:
-	@echo ">>> Downloading data from Semantic Scholar"2020-08-11
+	@echo ">>> Downloading data from Semantic Scholar"
 	@echo ">>> Downloading data files of $(date_str)"
 	curl -o data/raw/cord-19_$(date_str).tar.gz $(DATA_URL_Sem_Schol)
 	@echo ">>> Unzipping."
@@ -83,6 +83,7 @@ download_forecasting_data:
 	@echo ">>> Downloading data recovered cases global"
 	curl -o data/raw/$(date_str)/recovered_global.csv $(forecast_global_recovered)
 
+semantics_scholar_topics: data join_datasets mesh_yaml classify_data preproc_dataset make_topics
 
 ## Make Dataset
 #getting raw json files, not for metadata but other arxivs
@@ -274,6 +275,29 @@ re_dims_pub:
 
 re_dims_clin_trials:
 	$(PYTHON_INTERPRETER) scripts/script_relation_extraction.py data/processed/classified_dims_$(sheet_name_clin_trials)_covid.csv data/paperclassifier/classified_dims_$(sheet_name_clin_trials)_covid_relation.csv $(yaml_path)
+
+
+#############################################################################################
+################################ creating final folder with dash files ######################
+
+final_data:
+	@echo ">>> creating covid folder"
+	mkdir -p data/dashDatasets/covid/
+	@echo ">>> Moving data confirmed cases USA"
+	cp data/raw/$(date_str)/conf_USA.csv data/dashDatasets/covid/
+	@echo ">>> Moving data death data USA"
+	cp data/raw/$(date_str)/death_USA.csv data/dashDatasets/covid/
+	@echo ">>> Moving data confirmed cases Global"
+	cp data/raw/$(date_str)/conf_global.csv data/dashDatasets/covid/
+	@echo ">>> Moving data death data global"
+	cp data/raw/$(date_str)/death_global.csv data/dashDatasets/covid/
+	@echo ">>> Moving data recovered cases global"
+	cp data/raw/$(date_str)/recovered_global.csv data/dashDatasets/covid/
+
+
+
+semantics_scholar_topics: data join_datasets mesh_yaml classify_data preproc_dataset make_topics
+
 
 
 ## Delete all compiled Python files
