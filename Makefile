@@ -321,22 +321,22 @@ dash_file_structure:
 	mv data/dashDatasets/nre/pre_proc_classified_sem_scholar_covid_relation.csv data/dashDatasets/nre/semantic_scholar.csv
 	######## topic modelling data
 	@echo ">>> creating nre folder"
-	mkdir -p data/dashDatasets/topicmodelling/
+	mkdir -p data/dashDatasets/topicmodeling/
 	@echo ">>> Moving topic modelling Clinical trials"
-	cp data/topicmodels/dims_Clinical\ Trials_covid_topics/pcf_dims_Clinical\ Trials_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
-	mv data/dashDatasets/topicmodelling/pcf_dims_Clinical\ Trials_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Clinical_Trials.csv
+	cp data/topicmodels/dims_Clinical\ Trials_covid_topics/pcf_dims_Clinical\ Trials_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/
+	mv data/dashDatasets/topicmodeling/pcf_dims_Clinical\ Trials_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/Clinical_Trials.csv
 	@echo ">>> Moving topic modelling Publications 90-95% importance"
-	cp data/topicmodels/dims_Publications_hi_90_95_covid_topics/pcf_dims_Publications_hi_90_95_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
-	mv data/dashDatasets/topicmodelling/pcf_dims_Publications_hi_90_95_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Publications_hi_90_95.csv
+	cp data/topicmodels/dims_Publications_hi_90_95_covid_topics/pcf_dims_Publications_hi_90_95_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/
+	mv data/dashDatasets/topicmodeling/pcf_dims_Publications_hi_90_95_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/Publications_hi_90_95.csv
 	@echo ">>> Moving topic modelling Publications 95-100% importance"
-	cp data/topicmodels/dims_Publications_hi_95_100_covid_topics/pcf_dims_Publications_hi_95_100_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
-	mv data/dashDatasets/topicmodelling/pcf_dims_Publications_hi_95_100_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Publications_hi_95_100.csv
+	cp data/topicmodels/dims_Publications_hi_95_100_covid_topics/pcf_dims_Publications_hi_95_100_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/
+	mv data/dashDatasets/topicmodeling/pcf_dims_Publications_hi_95_100_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/Publications_hi_95_100.csv
 	@echo ">>> Moving topic modelling Publications from semantic_scholar"
-	cp data/topicmodels/sem_scholar_covid_topics/pcf_sem_scholar_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
-	mv data/dashDatasets/topicmodelling/pcf_sem_scholar_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/semantic_scholar.csv
+	cp data/topicmodels/sem_scholar_covid_topics/pcf_sem_scholar_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/
+	mv data/dashDatasets/topicmodeling/pcf_sem_scholar_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/semantic_scholar.csv
 	@echo ">>> Moving topic modelling Grants"
-	cp data/topicmodels/dims_Grants_covid_topics/pcf_dims_Grants_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/
-	mv data/dashDatasets/topicmodelling/pcf_dims_Grants_covid_topics_topic_data.csv data/dashDatasets/topicmodelling/Grants.csv
+	cp data/topicmodels/dims_Grants_covid_topics/pcf_dims_Grants_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/
+	mv data/dashDatasets/topicmodeling/pcf_dims_Grants_covid_topics_topic_data.csv data/dashDatasets/topicmodeling/Grants.csv
 
 
 
