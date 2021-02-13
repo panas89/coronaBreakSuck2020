@@ -12,13 +12,15 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = 2021-01-31#$(shell date +%Y-%m-%d -d "2 days ago")
+date_str = 2021-02-01#$(shell date +%Y-%m-%d -d "2 days ago")
+
+start_date = 2020-01-01 #date to inlcude data entries
 
 #https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html
 DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
 #https://dimensions.figshare.com/articles/dataset/Dimensions_COVID-19_publications_datasets_and_clinical_trials/11961063
-DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/25957832
+DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/26350861
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
@@ -114,7 +116,7 @@ preproc_dataset: #location and affilliations classification
 
 ## Run topic modelling over covid corpus
 make_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_merged_covid sem_scholar_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_merged_covid sem_scholar_covid_topics $(start_date)
 
 #############################################################################################
 #############################################################################################
@@ -163,8 +165,8 @@ top_5_10_perc_altmetric_papers:
 
 ## Run topic modelling over covid corpus
 make_dimensions_publications_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_95_100_covid dims_$(sheet_name_pub)_hi_95_100_covid_topics
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_90_95_covid dims_$(sheet_name_pub)_hi_90_95_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_95_100_covid dims_$(sheet_name_pub)_hi_95_100_covid_topics $(start_date)
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_pub)_hi_90_95_covid dims_$(sheet_name_pub)_hi_90_95_covid_topics $(start_date)
 
 
 #############################################################################################
@@ -194,7 +196,7 @@ classify_dimensions_datasets: #requirements
 
 ## Run topic modelling over covid corpus
 make_dimensions_datasets_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_dat)_covid dims_$(sheet_name_dat)_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_dat)_covid dims_$(sheet_name_dat)_covid_topics $(start_date)
 
 #############################################################################################
 #############################################################################################
@@ -220,7 +222,7 @@ classify_dimensions_clin_trials: #requirements
 
 ## Run topic modelling over covid corpus
 make_dimensions_clin_trials_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_clin_trials)_covid dims_$(sheet_name_clin_trials)_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_clin_trials)_covid dims_$(sheet_name_clin_trials)_covid_topics $(start_date)
 
 #############################################################################################
 #############################################################################################
@@ -245,7 +247,7 @@ classify_dimensions_grants: #requirements
 
 ## Run topic modelling over covid corpus
 make_dimensions_grants_topics:
-	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_grants)_covid dims_$(sheet_name_grants)_covid_topics
+	$(PYTHON_INTERPRETER) covid/models/topicmodeling/topic_generator.py $(yaml_path) classified_dims_$(sheet_name_grants)_covid dims_$(sheet_name_grants)_covid_topics $(start_date)
 
 #############################################################################################
 #############################################################################################
