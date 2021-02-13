@@ -122,9 +122,9 @@ def main(input_filepath, output_filepath, filename):
     # Create mesh extension of kws in yaml
     yml_dict = mesh_extension(mesh_obj, yaml_path)
 
-    print(list(mesh_obj.id2keywords.keys())[:10])
-    print(len(list(mesh_obj.id2keywords.keys())))
-    print(list(mesh_obj.id2keywords.values())[:3])
+    # print(list(mesh_obj.id2keywords.keys())[:10])
+    # print(len(list(mesh_obj.id2keywords.keys())))
+    # print(list(mesh_obj.id2keywords.values())[:3])
 
     # print(yml_dict)
 

@@ -30,7 +30,9 @@ def main(input_filepath, output_filepath, yaml_filepath, use_cols):
     logger.info("Replacing invalid dates to NaN")
 
     df["publish_time"] = [
-        pub_time if pd.notnull(pub_time) and len(pub_time) > 7 else np.nan
+        pub_time
+        if pd.notnull(pub_time) and isinstance(pub_time, str) and len(pub_time) > 7
+        else np.nan
         for pub_time in df["publish_time"]
     ]
 

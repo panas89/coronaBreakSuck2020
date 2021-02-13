@@ -8,7 +8,7 @@ if __name__ == "__main__":
     path = "data/dashDatasets/"
     folders = [
         "nre/",
-        "topicmodelling/",
+        "topicmodeling/",
     ]
     for folder in folders:
         print("Folder: ", folder)
@@ -23,7 +23,12 @@ if __name__ == "__main__":
             df = pd.read_csv(path + folder + filename)
 
             locations = []
-            for location in df["location"]:
+            if "semantic" in filename and folder == "topicmodeling/":
+                location_series = df["location_country"]
+            else:
+                location_series = df["location"]
+
+            for location in location_series:
                 if pd.isnull(location):
                     locations.append(location)
                 elif ";" in location:

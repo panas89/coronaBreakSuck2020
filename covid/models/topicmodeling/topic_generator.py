@@ -172,20 +172,23 @@ def learn_topics(df, class_col, output_filename, train_on_col="clean_text"):
 @click.argument("yaml_filepath", type=click.Path())
 @click.argument("input_filename", type=click.Path())
 @click.argument("output_filename", type=click.Path())
-def main(yaml_filepath, input_filename, output_filename):
+@click.argument("start_date", type=click.Path())
+def main(yaml_filepath, input_filename, output_filename, start_date):
 
     print("Loading & Cleaning The Data\n")
 
     # Load paperclassified data
     file_path = TOP_DIR + "/data/processed/" + input_filename + ".csv"
     df = pd.read_csv(file_path, parse_dates=["publish_time"])
+
+    print("Keeping only entries after " + start_date)
     df = process_pcf_data(
         df,
         bad_phrases=COMMON_PHRASES_REGEX,
         bad_tokens=COMMON_WORDS,
         clean_col="abstract",
         drop_nan_text=True,
-        from_date="2020-01-01",
+        from_date=start_date,
     )
 
     # Obtain class/subclass strings from yaml
