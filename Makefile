@@ -12,15 +12,15 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = 2021-02-01#$(shell date +%Y-%m-%d -d "2 days ago")
+date_str = 2021-03-01#$(shell date +%Y-%m-%d -d "2 days ago")
 
 start_date = 2020-01-01 #date to inlcude data entries
 
 #https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html
 DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
-#https://dimensions.figshare.com/articles/dataset/Dimensions_COVID-19_publications_datasets_and_clinical_trials/11961063
-DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/26350861
+#https://www.dimensions.ai/covid19/
+DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/26636273
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
