@@ -151,6 +151,8 @@ def load_files(dirname):
 def generate_clean_df(all_files):
     cleaned_files = []
 
+    pattern = r"\b(https://doi.org/10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+)\b"
+
     for file in tqdm(all_files):
         features = [
             file["paper_id"],
@@ -159,10 +161,15 @@ def generate_clean_df(all_files):
             format_authors(file["metadata"]["authors"], with_affiliation=True),
             format_location(file["metadata"]["authors"]),
             format_body(file["abstract"]),
-            format_body(file["body_text"]),
-            format_bib(file["bib_entries"]),
-            file["metadata"]["authors"],
-            file["bib_entries"],
+            np.nan,
+            np.nan,
+            np.nan,
+            np.nan,
+            # format_body(file["body_text"]),  # unused parts of the papers filtered out
+            # format_bib(file["bib_entries"]),
+            # file["metadata"]["authors"],
+            # file["bib_entries"],
+            getPattern(file["body_text"], pattern=pattern),
         ]
 
         cleaned_files.append(features)
@@ -178,10 +185,19 @@ def generate_clean_df(all_files):
         "bibliography",
         "raw_authors",
         "raw_bibliography",
+        "links",
     ]
 
     clean_df = pd.DataFrame(cleaned_files, columns=col_names)
-    clean_df.head()
+
+    # tqdm.pandas()
+
+    # print("Regex to fetch link from every document ...")
+    # links = clean_df["text"].progress_apply(lambda x: getPattern(x, pattern))
+
+    # clean_df["links"] = links
+
+    # df
 
     return clean_df
 
@@ -194,7 +210,7 @@ def generate_clean_df(all_files):
 def getPattern(x, pattern):
     "Method that returns regular expression patterns"
 
-    findings = re.findall(pattern, x)
+    findings = re.findall(pattern, str(x))
 
     if len(findings) > 0:
         return findings[0]
@@ -227,15 +243,6 @@ def getCSVPapers(filenames, relative_path):
         files.append(file)
 
     df = pd.concat(frames, axis=0)
-
-    tqdm.pandas()
-
-    pattern = r"\b(https://doi.org/10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+)\b"
-
-    print("Regex to fetch link from every document ...")
-    links = df["text"].progress_apply(lambda x: getPattern(x, pattern))
-
-    df["links"] = links
 
     return df
 

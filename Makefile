@@ -12,7 +12,7 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = 2021-03-01#$(shell date +%Y-%m-%d -d "2 days ago")
+date_str = 2022-01-03#$(shell date +%Y-%m-%d -d "2 days ago")
 
 start_date = 2020-01-01 #date to inlcude data entries
 
@@ -20,7 +20,7 @@ start_date = 2020-01-01 #date to inlcude data entries
 DATA_URL_Sem_Schol = https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_$(date_str).tar.gz
 
 #https://www.dimensions.ai/covid19/
-DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/26636273
+DATA_dimensions = https://dimensions.figshare.com/ndownloader/files/30718538
 
 forecast_US_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv
 forecast_global_conf = https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
@@ -131,14 +131,16 @@ dimensions_publications_topics: download_dimensions dimensions_publications_data
 
 ## Download datasets
 download_dimensions:
-	wget -O data/raw/$(date_str)/dimensions.xlsx $(DATA_dimensions)
+	wget -O data/raw/$(date_str)/dimensions.zip $(DATA_dimensions)
+	unzip data/raw/$(date_str)/dimensions.zip -d data/raw/$(date_str)
 
 #making dataset of dimensions publications into csv
 colsA_pub = ["Publication ID","Title","DOI","Abstract","Publication Date","Authors Affiliations","Country of Research organization"] #cols to be renamed
 colsB_pub = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
 sheet_name_pub = Publications
+dimensions_publications_filepath = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_publications.csv
 dimensions_publications_datasets: 
-	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_pub)_raw_data.csv dimensions.xlsx False $(sheet_name_pub) $(colsA_pub) $(colsB_pub) 
+	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_pub)_raw_data.csv $(dimensions_publications_filepath) False $(sheet_name_pub) $(colsA_pub) $(colsB_pub) 
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_dimensions_publications_data: #requirements
@@ -155,13 +157,13 @@ preproc_dimensions_publications_dataset: #location and affilliations classificat
 lb_95 = 0.95
 ub_100 = 1.00
 top_5_perc_altmetric_papers: 
-	$(PYTHON_INTERPRETER) covid/data/make_quantile_dimentions_papers.py data/raw/$(date_str)/ data/processed/classified_dims_$(sheet_name_pub)_hi_95_100_covid.csv dimensions.xlsx data/processed/classified_dims_$(sheet_name_pub)_covid.csv $(sheet_name_pub) $(lb_95) $(ub_100) 
+	$(PYTHON_INTERPRETER) covid/data/make_quantile_dimentions_papers.py data/raw/$(date_str)/ data/processed/classified_dims_$(sheet_name_pub)_hi_95_100_covid.csv $(dimensions_publications_filepath) data/processed/classified_dims_$(sheet_name_pub)_covid.csv $(sheet_name_pub) $(lb_95) $(ub_100) 
 
 ## Filtering top 5% high impact papers
 lb_90 = 0.90
 ub_95 = 0.9499
 top_5_10_perc_altmetric_papers: 
-	$(PYTHON_INTERPRETER) covid/data/make_quantile_dimentions_papers.py data/raw/$(date_str)/ data/processed/classified_dims_$(sheet_name_pub)_hi_90_95_covid.csv dimensions.xlsx data/processed/classified_dims_$(sheet_name_pub)_covid.csv $(sheet_name_pub) $(lb_90) $(ub_95) 
+	$(PYTHON_INTERPRETER) covid/data/make_quantile_dimentions_papers.py data/raw/$(date_str)/ data/processed/classified_dims_$(sheet_name_pub)_hi_90_95_covid.csv $(dimensions_publications_filepath) data/processed/classified_dims_$(sheet_name_pub)_covid.csv $(sheet_name_pub) $(lb_90) $(ub_95) 
 
 ## Run topic modelling over covid corpus
 make_dimensions_publications_topics:
@@ -180,15 +182,16 @@ make_dimensions_publications_topics:
 
 dimensions_datasets_topics: dimensions_datasets classify_dimensions_datasets make_dimensions_datasets_topics
 
-################################ Dimensions papers  #########################################
+################################ Dimensions datasets  #########################################
 #############################################################################################
 
 #making dataset of dimensions publications into csv
-colsA_dat = ["Dataset ID","Title","Source Linkout","Description","Publication year","Dataset author"] #cols to be renamed
+colsA_dat = ["Dataset ID","Title","Source Linkout","Description","Date added","Dataset author"] #cols to be renamed
 colsB_dat = ["sha","title","doi","abstract_x","publish_time","affiliations"] #default cols to follow through code 
 sheet_name_dat = Datasets
+datasets_filename = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_datasets.csv
 dimensions_datasets: 
-	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_dat)_raw_data.csv dimensions.xlsx False $(sheet_name_dat) $(colsA_dat) $(colsB_dat) 
+	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_dat)_raw_data.csv $(datasets_filename) False $(sheet_name_dat) $(colsA_dat) $(colsB_dat) 
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_dimensions_datasets: #requirements
@@ -206,15 +209,16 @@ make_dimensions_datasets_topics:
 
 dimensions_clin_trials_topics: dimensions_clin_trials classify_dimensions_clin_trials make_dimensions_clin_trials_topics
 
-################################ Dimensions papers  #########################################
+################################ Dimensions clinical trials  #########################################
 #############################################################################################
 
 #making dataset of dimensions publications into csv
 colsA_clin_trials = ["Trial ID","Title","Source Linkout","Abstract","Publication date","Country of Sponsor/Collaborator","Funder Country"]#cols to be renamed
 colsB_clin_trials = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
 sheet_name_clin_trials = "Clinical Trials"
+clinical_trials_filename = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_clinical_trials.csv
 dimensions_clin_trials: 
-	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_clin_trials)_raw_data.csv dimensions.xlsx False $(sheet_name_clin_trials) $(colsA_clin_trials) $(colsB_clin_trials)
+	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_clin_trials)_raw_data.csv $(clinical_trials_filename) False $(sheet_name_clin_trials) $(colsA_clin_trials) $(colsB_clin_trials)
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_dimensions_clin_trials: #requirements
@@ -231,15 +235,16 @@ make_dimensions_clin_trials_topics:
 
 dimensions_grants_topics: dimensions_grants classify_dimensions_grants make_dimensions_grants_topics
 
-################################ Dimensions papers  #########################################
+################################ Dimensions grants  #########################################
 #############################################################################################
 
 #making dataset of dimensions publications into csv
 colsA_grants = ["Grant ID","Title","Source linkout","Abstract","Start date","Research organizations country","Funders country"]#cols to be renamed
 colsB_grants = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
 sheet_name_grants = Grants
+grants_filename = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_grants.csv
 dimensions_grants: 
-	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_grants)_raw_data.csv dimensions.xlsx False $(sheet_name_grants) $(colsA_grants) $(colsB_grants) 
+	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_grants)_raw_data.csv $(grants_filename) False $(sheet_name_grants) $(colsA_grants) $(colsB_grants) 
 
 ## Classify Datasets to find only covid papers reduces file size by 100 fold
 classify_dimensions_grants: #requirements
@@ -258,7 +263,7 @@ make_dimensions_grants_topics:
 
 ################################# Relationship extraction   #################################
 
-re_run_all_sources: re_sem_scholar re_dims_pub re_dims_clin_trials
+re_run_all_sources: re_sem_scholar re_dims_pub re_dims_clin_trials re_pre_proc
 
 ################################ Semantic scholar relationships #############################
 
