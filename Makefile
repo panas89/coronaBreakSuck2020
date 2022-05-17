@@ -12,7 +12,7 @@ PYTHON_INTERPRETER = python3
 
 # url to download data
 # date_str = $(shell date +'%Y-%m-%d')
-date_str = 2022-01-03#$(shell date +%Y-%m-%d -d "2 days ago")
+date_str = 2022-01-31#$(shell date +%Y-%m-%d -d "2 days ago")
 
 start_date = 2020-01-01 #date to inlcude data entries
 
@@ -66,12 +66,12 @@ download_data:
 	@echo ">>> Downloading data from Semantic Scholar"
 	@echo ">>> Downloading data files of $(date_str)"
 	curl -o data/raw/cord-19_$(date_str).tar.gz $(DATA_URL_Sem_Schol)
+	@echo ">>> Unzipping. $(date_str) document parses"
+	tar xvzf data/raw/$(date_str)/document_parses.tar.gz -C data/raw/$(date_str)
 	@echo ">>> Unzipping."
 	tar xvzf data/raw/cord-19_$(date_str).tar.gz -C data/raw
 	@echo ">>> Unzipping. $(date_str) embeddings"
 	tar xvzf data/raw/$(date_str)/cord_19_embeddings.tar.gz -C data/raw/$(date_str)
-	@echo ">>> Unzipping. $(date_str) document parses"
-	tar xvzf data/raw/$(date_str)/document_parses.tar.gz -C data/raw/$(date_str)
 
 download_forecasting_data:
 	@echo ">>> Downloading Forecasting data from John Hopkins"
@@ -128,16 +128,27 @@ dimensions_publications_topics: download_dimensions dimensions_publications_data
 ################################ Dimensions papers  #########################################
 #############################################################################################
 
+sheet_name_pub = Publications
+sheet_name_dat = Datasets
+sheet_name_clin_trials = "Clinical Trials"
+sheet_name_grants = Grants
 
 ## Download datasets
 download_dimensions:
 	wget -O data/raw/$(date_str)/dimensions.zip $(DATA_dimensions)
 	unzip data/raw/$(date_str)/dimensions.zip -d data/raw/$(date_str)
+	# depending on the format the data in the zip are they have to be moved to the raw date folder
+	cp data/raw/$(date_str)/tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_publications.csv data/raw/$(date_str)/dims_$(sheet_name_pub)_raw_data.csv
+	cp data/raw/$(date_str)/tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_datasets.csv data/raw/$(date_str)/dims_$(sheet_name_dat)_raw_data.csv
+	cp data/raw/$(date_str)/tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_grants.csv data/raw/$(date_str)/dims_$(sheet_name_grants)_raw_data.csv
+	cp data/raw/$(date_str)/tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_clinical_trials.csv data/raw/$(date_str)/dims_$(sheet_name_clin_trials)_raw_data.csv
+
+
 
 #making dataset of dimensions publications into csv
 colsA_pub = ["Publication ID","Title","DOI","Abstract","Publication Date","Authors Affiliations","Country of Research organization"] #cols to be renamed
 colsB_pub = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
-sheet_name_pub = Publications
+
 dimensions_publications_filepath = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_publications.csv
 dimensions_publications_datasets: 
 	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_pub)_raw_data.csv $(dimensions_publications_filepath) False $(sheet_name_pub) $(colsA_pub) $(colsB_pub) 
@@ -188,7 +199,7 @@ dimensions_datasets_topics: dimensions_datasets classify_dimensions_datasets mak
 #making dataset of dimensions publications into csv
 colsA_dat = ["Dataset ID","Title","Source Linkout","Description","Date added","Dataset author"] #cols to be renamed
 colsB_dat = ["sha","title","doi","abstract_x","publish_time","affiliations"] #default cols to follow through code 
-sheet_name_dat = Datasets
+
 datasets_filename = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_datasets.csv
 dimensions_datasets: 
 	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_dat)_raw_data.csv $(datasets_filename) False $(sheet_name_dat) $(colsA_dat) $(colsB_dat) 
@@ -215,7 +226,7 @@ dimensions_clin_trials_topics: dimensions_clin_trials classify_dimensions_clin_t
 #making dataset of dimensions publications into csv
 colsA_clin_trials = ["Trial ID","Title","Source Linkout","Abstract","Publication date","Country of Sponsor/Collaborator","Funder Country"]#cols to be renamed
 colsB_clin_trials = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
-sheet_name_clin_trials = "Clinical Trials"
+
 clinical_trials_filename = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_clinical_trials.csv
 dimensions_clin_trials: 
 	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_clin_trials)_raw_data.csv $(clinical_trials_filename) False $(sheet_name_clin_trials) $(colsA_clin_trials) $(colsB_clin_trials)
@@ -241,7 +252,7 @@ dimensions_grants_topics: dimensions_grants classify_dimensions_grants make_dime
 #making dataset of dimensions publications into csv
 colsA_grants = ["Grant ID","Title","Source linkout","Abstract","Start date","Research organizations country","Funders country"]#cols to be renamed
 colsB_grants = ["sha","title","doi","abstract_x","publish_time","affiliations","location"] #default cols to follow through code 
-sheet_name_grants = Grants
+
 grants_filename = /tmp/tmpl41unnri/dimensions-covid19-export-2021-09-01-h15-01-02_grants.csv
 dimensions_grants: 
 	$(PYTHON_INTERPRETER) covid/data/make_dimensions_dataset.py data/raw/$(date_str)/ data/raw/$(date_str)/dims_$(sheet_name_grants)_raw_data.csv $(grants_filename) False $(sheet_name_grants) $(colsA_grants) $(colsB_grants) 
