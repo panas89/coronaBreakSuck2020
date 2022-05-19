@@ -1,5 +1,9 @@
 # coronaBreakSuck2020
 
+# to run the project
+
+follow the Makefile steps.
+
 # files
 
 - dataPreProcessing.py: reads csv files and preProcesses them using nltk, choose if to run files with text or only the metadata files, default only metadata
