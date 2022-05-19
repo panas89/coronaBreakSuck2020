@@ -15,7 +15,6 @@ certifi==2020.4.5.1
 chardet==3.0.4
 click==7.1.2
 contractions==0.0.24
--e git+https://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@github.com/panas89/coronabreaksuck2020@929acff6a565e9f821eb299cfab664ce598d38b4#egg=covid
 cssselect==1.1.0
 cycler==0.10.0
 cymem==2.0.4
